@@ -13,11 +13,11 @@
       "M34 30 18 40 9 74l13 4 8-22v32h40V56l8 22 13-4-9-34-16-10c0-26-32-26-32 0Zm0 0c4 18 28 18 32 0M38 74h24l5 14H33Z",
       "M50 14a36 36 0 1 0 .1 0Zm0 26a10 10 0 1 0 .1 0ZM27 40c3-7 9-13 17-15"
     ];
-    ["[T-shirt]", "[Hoodie]", "[Music or poster]"].forEach((name, n) => {
+    ["T-shirts", "Hoodies", "Music and posters"].forEach((name, n) => {
       const art = make("div", "", "art"), ns = "http://www.w3.org/2000/svg", svg = document.createElementNS(ns, "svg"), path = document.createElementNS(ns, "path");
       svg.setAttribute("viewBox", "0 0 100 100"); svg.setAttribute("aria-hidden", "true"); path.setAttribute("d", draw[n]); svg.append(path); art.append(svg);
       const c = make("div", "", "card"), b = make("button", "Coming soon"); b.disabled = true;
-      c.append(art, make("h3", name), make("p", "[Price]"), b); grid.append(c);
+      c.append(art, make("h3", name), make("p", "Price to be announced"), b); grid.append(c);
     });
   }
   if (!domain) return placeholders("The online store is not open yet.");

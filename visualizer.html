@@ -4,64 +4,85 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>RMP Visualizer</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=VT323&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap">
 <style>
-/* Layout: one early-2000s media player window: title bar, CRT screen, LCD readout, transport, playlist. Single dark look by design. */
-:root{color-scheme:dark;--night:#050a1a;--chrome1:#f4f8ff;--chrome2:#9aa9c4;--chrome3:#46536e;--ink:#0c1530;--aqua:#35c9ff;--lime:#9dff3c;--pink:#ff4fd8;--lcd:#041208;
---head:"Michroma",Verdana,sans-serif;--lcdf:"VT323","Courier New",monospace}
+/* Layout: floating nav, poster heading, large visual stage in a glass console, then transport, modes and playlist. Same dark space look as the main site. */
+:root{color-scheme:dark;--bg:#04030a;--fg:#f6f4ff;--muted:#aeaac6;--line:#ffffff1a;--accent:#ff6b35;--pink:#ff4fa3;--violet:#9d6bff;--on:#12060a;
+--grad:linear-gradient(100deg,#ff8a3d,#ff4fa3 52%,#a875ff);--glass:linear-gradient(160deg,#ffffff12,#ffffff05 40%,#ffffff08);
+--lift:inset 0 1px 0 #ffffff1f,0 2px 4px #0006,0 18px 36px -12px #000a,0 50px 90px -40px #7c3aed59;
+--poster:"Anton","Bricolage Grotesque",Impact,sans-serif;--display:"Bricolage Grotesque",system-ui,sans-serif;--body:"Instrument Sans",system-ui,sans-serif}
 *{box-sizing:border-box}[hidden]{display:none!important}
-body{margin:0;background:radial-gradient(ellipse at 50% 0,#1b3a8a,var(--night) 70%) fixed,var(--night);color:var(--chrome1);font:14px/1.5 Tahoma,Verdana,sans-serif;min-height:100vh}
-main{max-width:980px;margin:auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.back{color:var(--chrome1)}
-.window{margin-top:12px;padding:8px;border-radius:26px 26px 14px 14px;background:linear-gradient(170deg,var(--chrome1),var(--chrome2) 18%,#dce5f5 34%,var(--chrome3) 75%,var(--chrome2));box-shadow:0 0 0 1px #000,inset 0 0 0 1px #fff,0 24px 60px #000a}
-.titlebar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 16px;border-radius:18px 18px 4px 4px;background:linear-gradient(#6fb4ff,#1659c9 48%,#0a3c99 52%,#2a7ae8);text-shadow:0 1px 2px #000}
-h1{font:400 .9rem var(--head);margin:0;letter-spacing:.06em}
-.dots{display:flex;gap:6px}.dots i{width:13px;height:13px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,var(--aqua) 45%,#06407a)}
-.screen{position:relative;margin-top:8px;background:#000;border:3px solid var(--ink);border-radius:6px;overflow:hidden;height:clamp(240px,52vh,480px)}
-canvas{width:100%;height:100%;display:block}
-.screen::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(transparent 0 2px,#0005 2px 3px)}
-.screen:fullscreen{height:100%;border:0}
-.screen button{position:absolute;right:8px;bottom:8px;z-index:2}
-.lcd{margin-top:8px;padding:6px 12px;background:var(--lcd);color:var(--lime);font:1.35rem/1.25 var(--lcdf);border:2px inset var(--chrome2);border-radius:6px;display:flex;gap:14px;align-items:center;text-shadow:0 0 6px #9dff3c88}
-.scroll{flex:1;min-width:0;overflow:hidden;white-space:nowrap}.scroll span{display:inline-block;padding-left:100%;animation:marq 14s linear infinite}
-@keyframes marq{to{transform:translateX(-100%)}}
-#seek{width:100%;margin:10px 0 2px;accent-color:#1659c9}
-.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 4px}
-button,.file{font:700 13px Tahoma,Verdana,sans-serif;color:var(--ink);cursor:pointer;padding:8px 16px;border-radius:99px;border:1px solid var(--ink);background:linear-gradient(#fff,#cfdcf2 48%,#9db3d8 52%,#d5e4ff);box-shadow:inset 0 1px 0 #fff,0 2px 4px #0006}
-button[aria-pressed="true"]{background:linear-gradient(#d9f6ff,#5fd4ff 48%,#0fa3e8 52%,#7fe3ff)}
+html{background:var(--bg)}
+body{margin:0;color:var(--fg);font:16px/1.6 var(--body);min-height:100vh;overflow-x:clip;isolation:isolate}
+.sky{position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(ellipse 70% 55% at 100% 0,#7c3aed40,transparent),radial-gradient(ellipse 60% 50% at 0 70%,#ff4fa324,transparent),radial-gradient(ellipse 50% 40% at 90% 100%,#ff6b351f,transparent)}
+.sky::before{content:"";position:absolute;inset:0;background:linear-gradient(156deg,transparent 36%,#b9a3ff17 46%,#ff4fa314 52%,#4f6bff12 57%,transparent 68%)}
+#dust{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+main{max-width:1060px;margin:auto;padding-block:10px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+nav{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 8px 6px 20px;background:linear-gradient(160deg,#ffffff14,#100e1bcc);border:1px solid var(--line);border-radius:99px;box-shadow:var(--lift)}
+.logo{font:800 1.35rem var(--display);text-decoration:none;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.back{color:var(--muted);text-decoration:none;font-size:.9rem;font-weight:500;padding:8px 14px;border-radius:99px}
+.back:hover{color:var(--fg);background:#ffffff0f}
+h1{font:400 clamp(2.8rem,8vw,5.6rem)/1 var(--poster);text-transform:uppercase;margin:36px 0 22px;text-shadow:0 18px 50px #000b}
+h1::after{content:"✦";font-size:.4em;vertical-align:top;margin-left:.3em;color:var(--pink);text-shadow:none}
+.console{padding:14px;border:1px solid var(--line);border-radius:28px;background:var(--glass),#100e1bc7;box-shadow:var(--lift)}
+.screen{position:relative;background:var(--bg);border-radius:18px;overflow:hidden;height:clamp(250px,54vh,500px);box-shadow:0 0 0 1px #ffffff14,0 0 70px -24px #a875ffb3}
+canvas#viz{width:100%;height:100%;display:block}
+.screen:fullscreen{height:100%;border-radius:0}
+.screen button{position:absolute;right:10px;bottom:10px;z-index:2;background-color:#0b0914cc}
+.readout{display:flex;align-items:center;gap:14px;padding:16px 8px 4px;min-width:0}
+#title{flex:1;min-width:0;font:800 clamp(1.05rem,3vw,1.5rem)/1.3 var(--display);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#time{color:var(--muted);font-variant-numeric:tabular-nums}
+#state{font-size:.72rem;font-weight:600;letter-spacing:.1em;padding:3px 12px;border-radius:99px;border:1px solid #ff4fa373;background:#ff4fa31a;color:#ffb3d5;white-space:nowrap}
+input[type=range]{accent-color:var(--accent);cursor:pointer;min-width:0}
+#seek{width:calc(100% - 16px);margin:8px 8px 4px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:8px}
+button,.file{font:600 .92rem/1.2 var(--body);color:var(--fg);cursor:pointer;padding:11px 18px;border-radius:99px;border:1px solid var(--line);background:#ffffff0a;transition:transform .2s,border-color .2s,background-color .2s}
+button:not(:disabled):hover,.file:hover{transform:translateY(-2px);border-color:#a875ff99}
+#play,#modes button[aria-pressed="true"]{background:var(--grad) border-box;color:var(--on);border-color:transparent}
+#play{min-width:112px;box-shadow:0 12px 30px -10px #ff4fa3b3}
 button:disabled{opacity:.5;cursor:default}
-button:focus-visible,.file:focus-within,a:focus-visible,input:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+button:focus-visible,.file:focus-within,a:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 .file{position:relative}.file input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
-label.vol{display:flex;align-items:center;gap:6px;color:var(--ink);font-weight:700}
+label.vol{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.9rem}
 .sep{flex:1}
-.panel{margin-top:6px;background:var(--ink);border-radius:8px;padding:12px}
-.tabs{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-ol{margin:0;padding:0 0 0 1.8em;font:1.3rem var(--lcdf);color:var(--lime)}
-ol button{all:unset;cursor:pointer;padding:2px 6px}ol button[aria-current="true"]{background:#1659c9;color:#fff}ol button:focus-visible{outline:2px solid var(--pink)}ol button:disabled{opacity:.55;cursor:default}
-.sp-list{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.sp-out{color:var(--aqua)}
-@media(prefers-reduced-motion:reduce){.scroll span{animation:none;padding-left:0}}
+.modes{border-top:1px solid var(--line);margin-top:6px;padding-top:14px}
+#modes{padding:0;display:flex;flex-wrap:wrap;gap:8px}
+#motion{background:transparent;color:var(--muted)}
+.panel{margin-top:20px;border:1px solid var(--line);border-radius:28px;padding:20px;background:var(--glass),#100e1bc7;box-shadow:var(--lift)}
+.tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.tabs button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+ol{margin:0;padding:0;list-style:none;counter-reset:n;display:grid;gap:6px}
+ol li{counter-increment:n}
+ol button{width:100%;display:flex;gap:14px;text-align:left;border-radius:16px;padding:14px 16px;background:transparent;border-color:transparent;overflow-wrap:anywhere}
+ol button::before{content:counter(n,decimal-leading-zero);color:var(--pink);font-variant-numeric:tabular-nums}
+ol button:not(:disabled):hover{background:#ffffff0d;transform:none}
+ol button[aria-current="true"]{background:linear-gradient(100deg,#ff6b3526,#8b5cf626);border-color:#ff6b8a8c}
+.sp-list{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.sp-list button[aria-pressed="true"]{border-color:var(--pink);background:#ff4fa326}
+.sp-out{color:#cbb5ff}#sp p{color:var(--muted)}
+@media(max-width:600px){.console,.panel{padding:10px;border-radius:22px}.sep{display:none}label.vol{width:100%}label.vol input{flex:1}.readout{flex-wrap:wrap;gap:6px 12px}#title{flex-basis:100%;order:-1;white-space:normal}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
+<div class="sky" aria-hidden="true"></div><canvas id="dust" aria-hidden="true"></canvas>
 <main>
-<a class="back" href="index.html">← Back to RMP</a>
-<div class="window">
-<div class="titlebar"><h1>RMP Visualizer</h1><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+<nav aria-label="Main"><a class="logo" href="index.html">RMP</a><a class="back" href="index.html">← Back to RMP</a></nav>
+<h1>Visualizer</h1>
+<div class="console">
 <div class="screen" id="screen"><canvas id="viz" role="img" aria-label="Animated music visualizer"></canvas><button type="button" id="full">Full screen</button></div>
-<div class="lcd"><span id="time">0:00</span><div class="scroll"><span id="title" aria-live="polite">Pick a track or open an audio file</span></div><span id="state">DEMO</span></div>
+<div class="readout"><span id="title" aria-live="polite">Pick a track or open an audio file</span><span id="state">DEMO</span><span id="time">0:00</span></div>
 <input type="range" id="seek" min="0" max="1000" value="0" aria-label="Seek" disabled>
 <div class="bar">
 <button type="button" id="prev" aria-label="Previous track">⏮︎</button><button type="button" id="play">Play</button><button type="button" id="stop">Stop</button><button type="button" id="next" aria-label="Next track">⏭︎</button>
 <label class="file">Open audio file<input type="file" id="file" accept="audio/*" multiple></label>
-<span class="sep"></span><label class="vol">Vol <input type="range" id="vol" min="0" max="100" value="80"></label>
+<span class="sep"></span><label class="vol">Volume <input type="range" id="vol" min="0" max="100" value="80"></label>
 </div>
-<div class="bar" role="group" aria-label="Visual style" id="modes"></div>
-<div class="bar"><button type="button" id="motion"></button></div>
+<div class="bar modes"><div role="group" aria-label="Visual style" id="modes"></div><span class="sep"></span><button type="button" id="motion"></button></div>
+</div>
 <div class="panel">
 <div class="tabs"><button type="button" id="tabMine" aria-pressed="true">RMP tracks</button><button type="button" id="tabSp" aria-pressed="false">Spotify</button></div>
 <div id="mine"><ol id="list"></ol></div>
 <div id="sp" hidden><p>Visuals run on their own while Spotify is the source. They do not follow the Spotify audio, because Spotify's developer rules do not allow syncing its recordings with visuals.</p><p id="spStatus" aria-live="polite"></p><div class="sp-list" id="spList"></div><div id="spHost"></div></div>
-</div>
 </div>
 </main>
 <audio id="audio" preload="metadata"></audio>
@@ -111,29 +132,39 @@ document.addEventListener("fullscreenchange",()=>$("full").textContent=document.
 
 let W=0,H=0;const peaks=new Array(48).fill(0),buf=document.createElement("canvas"),bx=buf.getContext("2d");
 const stars=Array.from({length:260},()=>({x:Math.random()*2-1,y:Math.random()*2-1,z:Math.random()*.95+.05}));
-function clear(){g.globalAlpha=1;g.fillStyle="#000";g.fillRect(0,0,W,H)}
+const TINTS=["#ffffff","#ffffff","#cfd8ff","#d9c2ff","#ffc4e1","#ffd2ad"];
+const sweep=()=>{const c=g.createLinearGradient(0,0,W,0);c.addColorStop(0,"#ff8a3d");c.addColorStop(.5,"#ff4fa3");c.addColorStop(1,"#a875ff");return c};
+function clear(){g.globalAlpha=1;g.fillStyle="#04030a";g.fillRect(0,0,W,H)}
 function size(){const r=Math.min(devicePixelRatio||1,2),w=Math.round(cv.clientWidth*r),h=Math.round(cv.clientHeight*r);if(cv.width!==w||cv.height!==h){cv.width=buf.width=w;cv.height=buf.height=h;W=w;H=h;clear();dirty=true}}
 /* Live data only from our own <audio>. Otherwise a made-up signal driven by the clock. */
 function sample(t){if(source==="mine"&&an&&!audio.paused){an.getByteFrequencyData(freq);an.getByteTimeDomainData(wave);return}
 for(let i=0;i<512;i++)freq[i]=Math.max(0,(150+60*Math.sin(i*.09+t*1.7)+40*Math.sin(i*.031-t*1.1))*(1-i/620));
 for(let i=0;i<1024;i++)wave[i]=128+34*Math.sin(i*.03+t*2.3)+16*Math.sin(i*.011-t*1.4)}
 const level=(a,b)=>{let s=0;for(let i=a;i<b;i++)s+=freq[i];return s/(b-a)/255};
-function bars(){clear();const n=48,w=W/n,seg=Math.max(4,H/40);for(let i=0;i<n;i++){const a=Math.floor(Math.pow(400,i/n)),b=Math.max(a+1,Math.floor(Math.pow(400,(i+1)/n))),v=level(a,b)*H*.94;
-for(let y=0;y<v;y+=seg){const f=y/H;g.fillStyle=f>.72?"#ff4fd8":f>.5?"#ffe43c":"#9dff3c";g.fillRect(i*w+1,H-y-seg+2,w-2,seg-2)}
-peaks[i]=Math.max(v,peaks[i]-H*.006);g.fillStyle="#fff";g.fillRect(i*w+1,H-peaks[i]-4,w-2,3)}}
+function bars(){clear();const n=48,w=W/n,seg=Math.max(4,H/48),floor=H*.78,tone=sweep();for(let i=0;i<n;i++){const a=Math.floor(Math.pow(400,i/n)),b=Math.max(a+1,Math.floor(Math.pow(400,(i+1)/n))),v=level(a,b)*floor*.95;
+g.fillStyle=tone;for(let y=0;y<v;y+=seg){g.globalAlpha=1;g.fillRect(i*w+1,floor-y-seg+2,w-3,seg-2);const back=y*.3;if(back<H-floor){g.globalAlpha=.22*(1-back/(H-floor));g.fillRect(i*w+1,floor+back+3,w-3,Math.max(1,seg*.3-1))}}
+g.globalAlpha=1;peaks[i]=Math.max(v,peaks[i]-H*.006);g.fillStyle="#fff";g.fillRect(i*w+1,floor-peaks[i]-4,w-3,3)}}
 function trace(color,width,fn){g.strokeStyle=color;g.lineWidth=width;g.beginPath();fn();g.stroke()}
-function scope(){g.fillStyle="rgba(0,6,2,.3)";g.fillRect(0,0,W,H);for(const [c,lw] of [["rgba(157,255,60,.25)",H/50],["#d8ffb0",H/220]])trace(c,lw,()=>{for(let i=0;i<1024;i+=2){const x=i/1022*W,y=H/2+(wave[i]-128)/128*H*.46;i?g.lineTo(x,y):g.moveTo(x,y)}})}
+function scope(){g.fillStyle="rgba(4,3,10,.3)";g.fillRect(0,0,W,H);const tone=sweep();for(const [c,lw,alpha] of [[tone,H/34,.2],[tone,H/110,1],["#fff",Math.max(1,H/420),.8]]){g.globalAlpha=alpha;trace(c,lw,()=>{for(let i=0;i<1024;i+=2){const x=i/1022*W,y=H/2+(wave[i]-128)/128*H*.46;i?g.lineTo(x,y):g.moveTo(x,y)}})}g.globalAlpha=1}
 /* Feedback loop: redraw the last frame slightly bigger and rotated, in the style of early-2000s PC visualizers. */
 function tunnel(t){bx.clearRect(0,0,W,H);bx.drawImage(cv,0,0);clear();const bass=level(1,12);g.save();g.translate(W/2,H/2);g.rotate(.018+.01*Math.sin(t*.3));const z=1.035+bass*.025;g.scale(z,z);g.globalAlpha=.9;g.drawImage(buf,-W/2,-H/2);g.restore();
-const R=Math.min(W,H)*(.14+bass*.1);trace("hsl("+((t*40)%360)+",100%,62%)",H/160,()=>{for(let i=0;i<=180;i++){const a=i/180*Math.PI*2,r=R+(wave[(i%180)*5]-128)/128*R*.9,x=W/2+Math.cos(a+t*.5)*r,y=H/2+Math.sin(a+t*.5)*r;i?g.lineTo(x,y):g.moveTo(x,y)}})}
-function starfield(t,dt){g.fillStyle="rgba(2,4,20,.4)";g.fillRect(0,0,W,H);const speed=(.15+level(1,40)*.8)*dt;for(const s of stars){const old=s.z;s.z-=speed;if(s.z<=.05){s.x=Math.random()*2-1;s.y=Math.random()*2-1;s.z=1;continue}
-const p=z=>[W/2+s.x/z*W*.28,H/2+s.y/z*H*.28],[x0,y0]=p(old),[x1,y1]=p(s.z);trace(s.x>0?"#35c9ff":"#ff4fd8",(1-s.z)*H/110+1,()=>{g.moveTo(x0,y0);g.lineTo(x1+.5,y1+.5)})}
-const r=Math.min(W,H)*(.07+level(1,12)*.09),orb=g.createRadialGradient(W/2-r*.35,H/2-r*.4,r*.05,W/2,H/2,r);orb.addColorStop(0,"#fff");orb.addColorStop(.35,"#35c9ff");orb.addColorStop(1,"#08246b");g.fillStyle=orb;g.beginPath();g.arc(W/2,H/2,r,0,7);g.fill()}
+const R=Math.min(W,H)*(.14+bass*.1);trace("hsl("+(320+62*Math.sin(t*.55))+",100%,65%)",H/160,()=>{for(let i=0;i<=180;i++){const a=i/180*Math.PI*2,r=R+(wave[(i%180)*5]-128)/128*R*.9,x=W/2+Math.cos(a+t*.5)*r,y=H/2+Math.sin(a+t*.5)*r;i?g.lineTo(x,y):g.moveTo(x,y)}})}
+function starfield(t,dt){g.fillStyle="rgba(4,3,10,.4)";g.fillRect(0,0,W,H);const speed=(.15+level(1,40)*.8)*dt;for(let n=0;n<stars.length;n++){const s=stars[n],old=s.z;s.z-=speed;if(s.z<=.05){s.x=Math.random()*2-1;s.y=Math.random()*2-1;s.z=1;continue}
+const p=z=>[W/2+s.x/z*W*.28,H/2+s.y/z*H*.28],[x0,y0]=p(old),[x1,y1]=p(s.z);trace(TINTS[n%TINTS.length],(1-s.z)*H/130+1,()=>{g.moveTo(x0,y0);g.lineTo(x1+.5,y1+.5)})}
+/* a ringed planet in the middle, swelling with the low end */
+const r=Math.min(W,H)*(.08+level(1,12)*.09),orb=g.createRadialGradient(W/2-r*.35,H/2-r*.4,r*.05,W/2,H/2,r*1.05);orb.addColorStop(0,"#ffd2ad");orb.addColorStop(.28,"#ff6b8a");orb.addColorStop(.68,"#6d35c9");orb.addColorStop(1,"#1a0d38");
+const ring=(from,to)=>{g.strokeStyle="#ffc4e1b3";g.lineWidth=Math.max(1.5,r*.05);g.beginPath();g.ellipse(W/2,H/2,r*1.75,r*.46,-.32,from,to);g.stroke()};
+ring(Math.PI,Math.PI*2);g.fillStyle=orb;g.beginPath();g.arc(W/2,H/2,r,0,7);g.fill();ring(0,Math.PI)}
 const draw={bars,scope,tunnel,stars:starfield};
+const sky=$("dust"),sg=sky.getContext("2d");
+const field=Array.from({length:Math.round(Math.min(600,Math.max(220,innerWidth*innerHeight/1900)))},(_,i)=>{const big=i%14===0;return{x:Math.random(),y:Math.random(),r:big?1.4+Math.random():.7+Math.random()*1.1,big,c:TINTS[i%TINTS.length],phase:Math.random()*7,speed:.8+Math.random()*2}});
+let skyKey="";
+function night(){const r=Math.min(devicePixelRatio||1,2),w=sky.clientWidth,h=sky.clientHeight,fresh=sky.width!==Math.round(w*r)||sky.height!==Math.round(h*r);if(!motion&&!fresh&&skyKey==="still")return;skyKey=motion?"":"still";
+if(fresh){sky.width=Math.round(w*r);sky.height=Math.round(h*r)}sg.setTransform(r,0,0,r,0,0);sg.clearRect(0,0,w,h);for(const p of field){const glow=motion?.65+.35*Math.sin(vt*p.speed+p.phase):1;sg.globalAlpha=(p.big?.9:.62)*glow;sg.fillStyle=p.c;sg.fillRect(p.x*w,p.y*h,p.r,p.r);if(p.big){sg.globalAlpha=.35*glow;sg.fillRect(p.x*w-p.r*2.5,p.y*h+p.r/2-.4,p.r*6,.8);sg.fillRect(p.x*w+p.r/2-.4,p.y*h-p.r*2.5,.8,p.r*6)}}}
 let last=0,vt=0;
 function frame(ms){const dt=Math.min(.05,(ms-last)/1000||0);last=ms;size();
 if(W&&H){if(motion){vt+=dt;sample(vt);draw[mode](vt,dt)}else if(dirty){for(let k=0;k<40;k++){sample(2+k/60);draw[mode](2+k/60,1/60)}}dirty=false}
-requestAnimationFrame(frame)}
+night();requestAnimationFrame(frame)}
 renderList();requestAnimationFrame(frame);
 </script>
 </body>

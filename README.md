@@ -35,3 +35,24 @@ for example `photo:"images/cuddie.jpg"`. Use only photos you have permission to 
 
 ## Testing
 Use a web host or a local server (`python3 -m http.server`), not a double-clicked file.
+
+## Interactive art layer (index.html)
+- Hero contour lines react to the pointer and clicks, and to the bass of RMP's own tracks (not Spotify).
+- Drag the record to scrub the current track. Seeking needs a normal web host (one that supports byte ranges); Python's basic `http.server` does not.
+- Style filter chips are matched against each artist's `tags`. Add a new chip if you add a new style.
+- The countdown uses the show's `starts` and `ends` times. Include both when you add a show.
+- The name ticker fills itself from the `artists` list.
+
+## Past shows (index.html)
+Edit the `pastShows` list. Each entry has a headliner, place, date, venue, openers, summary and photos.
+Opener names must match the `artists` list. To add pictures from a show, put them in `images` and list
+their paths in `photos`. Upcoming shows do not move here by themselves; add an entry after the show.
+
+## Colors
+The main colors are the variables at the end of the first `:root` rule (`--bg`, `--accent`, `--pink`,
+`--violet`, `--grad`). Canvas art and some glows have their own color values further down.
+The visualizer page uses the same palette; its colors are set at the top of `visualizer.html` and in its drawing functions.
+
+## Collaborators and stars (index.html)
+- Edit the `collaborators` list to add people. `role` and `photo` are optional; without a photo the card shows initials.
+- The star field is drawn by `dust()`. The number of stars scales with the screen size; change the limits in `specks`.
