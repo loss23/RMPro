@@ -46,3 +46,4 @@ ol button[aria-current="true"]{background:linear-gradient(100deg,#ff6b3526,#8b5c
 .sp-out{color:#cbb5ff}#sp p{color:var(--muted)}
 @media(max-width:600px){.console,.panel{padding:10px;border-radius:22px}.sep{display:none}label.vol{width:100%}label.vol input{flex:1}.readout{flex-wrap:wrap;gap:6px 12px}#title{flex-basis:100%;order:-1;white-space:normal}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+nav .logo{margin-right:auto}

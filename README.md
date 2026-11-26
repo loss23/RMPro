@@ -7,9 +7,9 @@ Upload every file in this folder to the same place on your web host. No build st
 |---|---|
 | Artists, collaborators, upcoming and past shows | `content.js` |
 | Shopify, Spotify and your own tracks | `config.js` |
-| Page text and section order | `index.html`, `visualizer.html` |
+| Page text and section order | `index.html`, `visualizer.html`, `tv.html` |
 | Colors and fonts (both pages) | `theme.css` |
-| Layout and looks | `styles.css` (home), `visualizer.css` |
+| Layout and looks | `styles.css` (home), `visualizer.css`, `tv.css` |
 
 Other scripts: `app.js` (player and page content), `effects.js` (home animation), `shared.js` (star field and
 canvas helpers used by both pages), `spotify.js`, `shopify.js`, `visualizer.js`. Keep the script order in the HTML files.
@@ -24,23 +24,39 @@ canvas helpers used by both pages), `spotify.js`, `shopify.js`, `visualizer.js`.
 The site shows up to 12 products with up to 20 options each. Checkout and payment happen on Shopify.
 A password-protected store may block checkout until the password is removed.
 
+## RMP.TV
+`tv.html` is a TV-style page around YouTube's own player. Settings are `youtube` in `config.js`.
+- With `videos` empty it loads the channel's uploads list, so new public uploads should appear without editing the site.
+- To pick videos yourself, add `{ title, link }` entries to `videos`. Titles you type show in the channel guide right away;
+  with the automatic list, a video's title appears after it has been tuned in.
+- YouTube does not allow anything on top of its player and needs it at least 200 by 200 pixels. Keep that if you restyle it.
+- YouTube also needs to know which site is asking, so test on a web host or local server.
+
+## Page titles, descriptions and icon
+Each HTML file has its own `<title>` and description near the top. The icon files are `favicon.svg`,
+`favicon-32.png` and `apple-touch-icon.png`. The `og:url` and `og:image` tags point at
+`https://loss23.github.io/RMPro/`; change them if you move to your own domain.
+
 ## Spotify
 Add share links to the `spotify` list. No API key is needed. This uses Spotify's embed player;
 what a listener can play (full track or preview) depends on their Spotify login and plan.
 It does not include account sign-in, search, or Web API data.
 
-On the home page, choose **Spotify** at the top of the record player. The official Spotify player appears inside it,
-and the site's play, pause, seek bar and record drag control it. Previous and next move between the artists in the
-`spotify` list (Spotify's embed controls do not offer next song). Spotify loads only after someone picks it.
+On the home page this is **RMP Radio**: each entry in the `spotify` list is a channel. If an entry's title matches an
+artist in `content.js`, the channel and poster use that artist's photo. The official Spotify player sits inside
+the RMP frame, unchanged, with RMP play, pause and seek controls below it.
+A user profile link cannot be played by Spotify's embed, so that channel shows a button to the profile instead
+(it is left out of the visualizer's Spotify list). Previous and next change channels
+(Spotify's embed controls do not offer next song). Spotify loads when the player is near the screen.
 Some browsers require the first press to be inside the Spotify player itself.
 
 ## Your own music
-Add MP3 paths under `tracks`. Host them on the same site as the pages. Audio from another domain
+These play on the visualizer page only. Add MP3 paths under `tracks`. Host them on the same site as the pages. Audio from another domain
 without CORS permission will not drive the visualizer and may be silent.
 
 ## Spotify rules to know
-- The Developer Policy says not to synchronize Spotify recordings with visual media. So the record does not spin
-  and the sound bars are hidden for Spotify, and the visualizer does not read Spotify playback. Showing free-running visuals beside the player is our design choice,
+- The Developer Policy says not to synchronize Spotify recordings with visual media. So nothing on the home page
+  animates with Spotify, and the visualizer does not read Spotify playback. Showing free-running visuals beside the player is our design choice,
   not something Spotify has approved.
 - The policy also restricts commercial use around Spotify streaming and has separate Widget Terms.
   Review both before putting the store and the player on the same live site:
@@ -54,8 +70,7 @@ for example `photo:"images/cuddie.jpg"`. Use only photos you have permission to 
 Use a web host or a local server (`python3 -m http.server`), not a double-clicked file.
 
 ## Interactive art layer (home page)
-- Hero contour lines react to the pointer and clicks, and to the bass of RMP's own tracks (not Spotify).
-- Drag the record to scrub the current track. Seeking needs a normal web host (one that supports byte ranges); Python's basic `http.server` does not.
+- Hero contour lines react to the pointer and clicks.
 - Style filter chips are matched against each artist's `tags`. Add a new chip if you add a new style.
 - The countdown uses the show's `starts` and `ends` times. Include both when you add a show.
 - The name ticker fills itself from the `artists` list.

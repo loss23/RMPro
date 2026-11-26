@@ -1,9 +1,7 @@
-/* Home page: player, artists, collaborators, shows and navigation. Data comes from content.js and config.js. */
+/* Home page: Spotify player, artists, collaborators, shows and navigation. Data comes from content.js and config.js. */
 const $ = id => document.getElementById(id);
 const calm = matchMedia("(prefers-reduced-motion: reduce)");
-const player = $("player");
 const settings = window.RMP_CONFIG || {};
-const tracks = (settings.tracks || []).filter(t => t.src);
 
 /* ---------- small helpers ---------- */
 function el(tag, text, cls) { const e = document.createElement(tag); if (text) e.textContent = text; if (cls) e.className = cls; return e; }
@@ -44,184 +42,110 @@ function wireDialog(dialog, closeButton) {
   dialog.onclick = e => { if (e.target === dialog) dialog.close(); };
 }
 
-/* ---------- player ---------- */
+/* ---------- RMP Radio: our own frame and controls around Spotify's official embedded player ---------- */
+/* Only play, pause and seek are sent to Spotify. The embedded player is shown as Spotify draws it, and nothing
+   on the page animates along with its audio (Spotify's Developer Policy does not allow syncing it with visuals). */
 const ICON = {
   play: '<svg viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z"/></svg>',
   pause: '<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>'
 };
-/* ac, an and freq are the Web Audio graph for RMP's own files; effects.js reads them. */
-let current = -1, ac = null, an = null, freq = null;
-/* source is which music the record player controls: "rmp" (our files) or "spotify". */
-let source = "rmp", spotify = null;
-let sp = { ready: false, paused: true, position: 0, duration: 0 }, spTitle = "Spotify", spStarted = false;
-let listening = true; // true while the main player is on screen
+const noPlayer = () => {};
+let spotify = { toggle: noPlayer, seek: noPlayer, step: noPlayer };
+let sp = { ready: false, paused: true, position: 0, duration: 0 }, spStarted = false, spWaiting = 0, seeking = false;
+let listening = true; // true while the radio is on screen
+let playable = true; // false on a channel that is only a Spotify profile link
 
-const artOf = track => (artists.find(a => a.name === track.artist) || {}).photo || "";
-function paintCover(node, track) {
-  const art = artOf(track);
-  node.style.backgroundImage = art ? cssUrl(art) : "";
-  node.textContent = art ? "" : "RMP";
-}
-function connectAnalyser() {
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  if (ac || !AudioCtx || location.protocol === "file:") return;
-  ac = new AudioCtx(); an = ac.createAnalyser(); an.fftSize = 256; freq = new Uint8Array(an.frequencyBinCount);
-  ac.createMediaElementSource(player).connect(an); an.connect(ac.destination);
-}
-/* ---------- what the player and mini player show ---------- */
-const isPlaying = () => source === "rmp" ? !player.paused : !sp.paused;
-function showNow() {
-  const mine = source === "rmp", track = mine ? tracks[current] : null;
-  const title = mine ? (track ? track.title : "Music coming soon") : spTitle, by = mine ? (track && track.artist) || "" : "On Spotify";
-  $("nowTitle").textContent = $("dockTitle").textContent = title;
-  $("now").textContent = $("dockArtist").textContent = by;
-  // Spotify mode keeps a plain RMP record label; the official Spotify player shows its own artwork.
-  document.querySelector(".now").style.setProperty("--art", cssUrl(track ? artOf(track) : ""));
-  paintCover($("cover"), track || {}); paintCover($("dockCover"), track || {});
-}
+/* The artist entry behind a Spotify list item. Playlists and other titles get a plain RMP look. */
+const channelArtist = title => artists.find(a => a.name === title) ||
+  { name: title, photo: "", mono: "RMP", bg: "linear-gradient(145deg,#3b1d8f,#8b3fd1 48%,#150c33)" };
+const twoDigits = n => String(n).padStart(2, "0");
+
 function showTime(position, duration) {
-  const known = isFinite(duration) && duration > 0;
+  const known = duration > 0;
   $("elapsed").textContent = clock(position); $("total").textContent = clock(duration);
   $("seek").value = known ? position / duration * 1000 : 0; $("seek").disabled = !known;
 }
 function showPlayState() {
-  const playing = isPlaying();
-  for (const id of ["toggle", "dockToggle"]) { $(id).innerHTML = playing ? ICON.pause : ICON.play; $(id).setAttribute("aria-label", playing ? "Pause" : "Play"); }
-  $("heroPlay").textContent = playing ? "Pause music" : "Play music";
+  for (const id of ["toggle", "dockToggle"]) { $(id).innerHTML = sp.paused ? ICON.play : ICON.pause; $(id).setAttribute("aria-label", sp.paused ? "Play" : "Pause"); }
 }
 function showControls() {
-  const usable = source === "rmp" ? tracks.length > 0 : sp.ready;
-  ["toggle", "dockToggle", "prev", "next"].forEach(id => $(id).disabled = !usable);
-  const unit = source === "rmp" ? "track" : "artist";
-  $("prev").setAttribute("aria-label", "Previous " + unit); $("next").setAttribute("aria-label", "Next " + unit);
+  ["prev", "next"].forEach(id => $(id).disabled = !sp.ready);
+  ["toggle", "dockToggle"].forEach(id => $(id).disabled = !sp.ready || !playable);
 }
 function updateDock() {
-  const started = source === "rmp" ? current >= 0 && (player.currentTime > 0 || !player.paused) : spStarted;
-  const visible = started && !listening;
+  const visible = spStarted && playable && !listening;
   $("dock").hidden = !visible; document.body.classList.toggle("docked", visible);
 }
-function refresh() {
-  showNow(); showControls(); showPlayState(); updateDock();
-  if (source === "rmp") showTime(player.currentTime || 0, player.duration); else showTime(sp.position, sp.duration);
-}
-
-/* ---------- RMP's own tracks ---------- */
-function load(i) {
-  current = i; player.src = tracks[i].src;
-  document.querySelectorAll(".track[aria-current]").forEach(b => b.removeAttribute("aria-current"));
-  $("tracks").children[i].firstChild.setAttribute("aria-current", "true");
-  refresh();
-}
-function play() {
-  if (spotify) spotify.pause();
-  connectAnalyser();
-  if (ac && ac.state !== "running") ac.resume();
-  player.play().catch(e => { if (e.name !== "AbortError") $("now").textContent = "Could not play this track. Please try again."; });
-}
-function choose(i) { setSource("rmp"); if (i !== current) load(i); play(); }
-
-/* ---------- Spotify, controlled through its official embedded player ---------- */
-/* Only play, pause and seek are sent to Spotify. Nothing on the page animates along with its audio
-   (Spotify's Developer Policy does not allow syncing its recordings with visuals). */
-let spWaiting = 0;
 function onSpotifyState(state) {
   const wasPlaying = !sp.paused, becameReady = !sp.ready;
-  if (source !== "spotify") { // a late message must not interrupt our own tracks
-    sp = { ...state, paused: true };
+  if (!playable) { // nothing plays on a profile channel
+    sp = { ready: true, paused: true, position: 0, duration: 0 };
     if (!state.paused) spotify.pause();
+    if (becameReady) showControls();
     return;
   }
   sp = state;
-  if (!state.paused) { spStarted = true; clearTimeout(spWaiting); $("spStatus").textContent = ""; player.pause(); }
+  if (!state.paused) { spStarted = true; clearTimeout(spWaiting); $("spStatus").textContent = ""; }
   if (becameReady) showControls();
   if (becameReady || wasPlaying === state.paused) { showPlayState(); updateDock(); }
-  if (!scrubbing) showTime(state.position, state.duration);
+  if (!seeking) showTime(state.position, state.duration);
 }
-/* Spotify's player is a large third-party download, so it loads only when someone picks Spotify. */
+function toggle() {
+  if (!sp.ready || !playable) return;
+  clearTimeout(spWaiting);
+  if (sp.paused) spWaiting = setTimeout(() => $("spStatus").textContent = "If it does not start, press play in the Spotify player.", 2500);
+  spotify.toggle();
+}
+
+/* Change the poster, the big name and the mini player to the chosen channel. */
+function showChannel(title, number) {
+  const artist = channelArtist(title), art = $("posterArt"), cover = $("dockCover");
+  art.textContent = ""; picture(art, artist, artist.full || artist.photo);
+  cover.textContent = ""; picture(cover, artist, artist.photo);
+  $("channelNo").textContent = twoDigits(number);
+  $("nowTitle").textContent = $("dockTitle").textContent = title;
+  $("dockArtist").textContent = "On Spotify";
+}
+
+$("toggle").onclick = $("dockToggle").onclick = toggle;
+$("prev").onclick = () => spotify.step(-1);
+$("next").onclick = () => spotify.step(1);
+/* The time updates while the slider is dragged; Spotify gets one seek when it is let go. */
+$("seek").oninput = e => { seeking = true; showTime(e.target.value / 1000 * sp.duration, sp.duration); };
+$("seek").onchange = e => {
+  seeking = false;
+  sp.position = e.target.value / 1000 * sp.duration; spotify.seek(sp.position);
+};
+showControls(); showPlayState();
+new IntersectionObserver(e => { listening = e[0].isIntersecting; updateDock(); }, { threshold: .15 }).observe(document.querySelector(".radio"));
+
+/* Spotify's player is a large third-party download, so it loads only when the radio gets close. */
 function mountSpotify() {
-  if (spotify || !window.RMPSpotify) return;
+  if (!window.RMPSpotify) return;
   spotify = RMPSpotify.mount({
-    items: settings.spotify, host: $("spHost"), list: $("spList"), status: $("spStatus"), height: 152,
-    fill(row, item) {
-      const art = el("span", "", "cover"), words = el("span");
-      paintCover(art, { artist: item.title });
-      words.append(el("b", item.title), el("small", "Spotify"));
-      row.className = "track"; row.append(art, words);
+    profiles: true, items: settings.spotify, host: $("spHost"), list: $("spList"), status: $("spStatus"), height: 352,
+    fill(tab, item, n) {
+      const orb = el("span", "", "orb"), words = el("span"), artist = channelArtist(item.title);
+      picture(orb, artist, artist.photo);
+      words.append(el("small", "CH " + twoDigits(n + 1)), el("b", item.title));
+      tab.className = "channel"; tab.append(orb, words);
     },
-    onSelect(item) { spTitle = item.title; sp = { ...sp, paused: true, position: 0, duration: 0 }; if (source === "spotify") refresh(); },
+    onSelect(item) {
+      showChannel(item.title, [...$("spList").children].findIndex(b => b.getAttribute("aria-pressed") === "true") + 1);
+      playable = !!item.uri;
+      $("spHost").hidden = !playable; $("profileCard").hidden = playable;
+      if (!playable) { $("profileTitle").textContent = item.title + " on Spotify"; $("profileLink").href = item.url; clearTimeout(spWaiting); if (sp.ready) $("spStatus").textContent = ""; }
+      sp = { ...sp, paused: true, position: 0, duration: 0 };
+      seeking = false; showTime(0, 0); showPlayState(); showControls(); updateDock();
+    },
     onState: onSpotifyState
   });
 }
-
-function setSource(next) {
-  if (next === source) return;
-  source = next;
-  const mine = source === "rmp";
-  if (mine) { if (spotify) spotify.pause(); clearTimeout(spWaiting); }
-  else { player.pause(); mountSpotify(); }
-  $("tabMine").setAttribute("aria-pressed", String(mine)); $("tabSp").setAttribute("aria-pressed", String(!mine));
-  $("minePanel").hidden = !mine; $("spPanel").hidden = mine; $("spPane").hidden = mine; $("spectrum").hidden = !mine;
-  $("scrubHint").textContent = mine ? "Drag the record to scrub through a song." : "Drag the record to scrub. With Spotify, it turns only when you turn it.";
-  refresh();
-}
-
-/* ---------- shared controls ---------- */
-function toggle() {
-  if (source === "spotify") {
-    if (!sp.ready) return;
-    if (sp.paused) { player.pause(); clearTimeout(spWaiting); spWaiting = setTimeout(() => $("spStatus").textContent = "If it does not start, press play in the Spotify player.", 2500); }
-    spotify.toggle();
-  } else if (tracks.length) {
-    if (current < 0) choose(0); else if (player.paused) play(); else player.pause();
-  }
-}
-function skip(step) {
-  if (source === "spotify") { if (sp.ready) spotify.step(step); }
-  else if (tracks.length) choose((Math.max(current, 0) + step + tracks.length) % tracks.length);
-}
-
-/* Scrubbing, used by the record (effects.js) and the seek bar. Spotify gets one seek when the drag ends. */
-let scrubbing = false, scrubTarget = 0;
-const canScrub = () => source === "rmp" ? current >= 0 && player.duration > 0 : sp.ready && sp.duration > 0;
-function scrubStart() { scrubbing = true; scrubTarget = source === "rmp" ? player.currentTime : sp.position; }
-function scrubBy(seconds) {
-  const duration = source === "rmp" ? player.duration : sp.duration;
-  scrubTarget = Math.min(duration - .2, Math.max(0, scrubTarget + seconds));
-  if (source === "rmp") player.currentTime = scrubTarget; else showTime(scrubTarget, duration);
-}
-function scrubEnd() {
-  if (!scrubbing) return;
-  scrubbing = false;
-  if (source === "spotify") { spotify.seek(scrubTarget); sp.position = scrubTarget; }
-}
-
-tracks.forEach((track, i) => {
-  const item = el("li"), row = button("", "track", () => i === current ? toggle() : choose(i));
-  const art = el("span", "", "cover"), words = el("span"), length = el("span", "", "time");
-  paintCover(art, track); words.append(el("b", track.title), el("small", track.artist));
-  row.append(art, words, length); item.append(row); $("tracks").append(item);
-  const probe = new Audio(); probe.preload = "metadata";
-  probe.onloadedmetadata = () => length.textContent = clock(probe.duration); probe.src = track.src;
-});
-$("toggle").onclick = $("dockToggle").onclick = toggle;
-$("prev").onclick = () => skip(-1);
-$("next").onclick = () => skip(1);
-$("tabMine").onclick = () => setSource("rmp");
-$("tabSp").onclick = () => setSource("spotify");
-$("heroPlay").onclick = () => source === "spotify" || tracks.length ? toggle() : $("listen").scrollIntoView();
-player.onplay = () => { if (spotify) spotify.pause(); if (source !== "rmp") setSource("rmp"); showPlayState(); updateDock(); };
-player.onpause = () => showPlayState();
-player.onended = () => skip(1);
-player.onloadedmetadata = player.ontimeupdate = () => { if (source === "rmp") showTime(player.currentTime, player.duration); };
-$("seek").oninput = e => { // while dragging the seek bar
-  if (!canScrub()) return;
-  if (!scrubbing) scrubStart();
-  const duration = source === "rmp" ? player.duration : sp.duration;
-  scrubBy(e.target.value / 1000 * duration - scrubTarget);
-};
-$("seek").onchange = scrubEnd;
-if (tracks.length) load(0); else refresh();
-new IntersectionObserver(e => { listening = e[0].isIntersecting; updateDock(); }, { threshold: .15 }).observe(document.querySelector(".console"));
+const spotifyWatcher = new IntersectionObserver(entries => {
+  if (!entries.some(e => e.isIntersecting)) return;
+  spotifyWatcher.disconnect(); mountSpotify();
+}, { rootMargin: "300px" });
+spotifyWatcher.observe(document.querySelector(".radio"));
 
 /* ---------- artists: tiles, profile pop-up, style filters and name ticker ---------- */
 function openProfile(artist) {
@@ -233,8 +157,7 @@ function openProfile(artist) {
   $("pBio").textContent = artist.bio || "Bio coming soon.";
   const actions = $("pActions"); actions.textContent = "";
   if (artist.url) actions.append(externalLink(artist.linkLabel || "Listen on " + artist.service, artist.url, "btn"));
-  const own = tracks.findIndex(t => t.artist === artist.name);
-  if (own >= 0) actions.append(button("Play " + tracks[own].title + " here", "ghost", () => { choose(own); $("profile").close(); $("listen").scrollIntoView(); }));
+  if (artist.spotify) actions.append(externalLink("Listen on Spotify", artist.spotify, "btn ghost"));
   $("profile").showModal(); $("profile").scrollTop = 0;
 }
 wireDialog($("profile"), $("pClose"));
@@ -379,7 +302,7 @@ if (!calm.matches && "IntersectionObserver" in window) {
     reveal.unobserve(e.target); e.target.classList.add("in");
     setTimeout(() => e.target.classList.remove("rise", "in"), 1000);
   }), { rootMargin: "0px 0px -6% 0px" });
-  document.querySelectorAll(".head,.console,#chips,#artistList,#collabList,#showList,#pastList,#merchList,.about")
+  document.querySelectorAll(".head,.radio,#chips,#artistList,#collabList,#showList,#pastList,#merchList,.about")
     .forEach(node => { node.classList.add("rise"); reveal.observe(node); });
 }
 
@@ -396,7 +319,7 @@ if (matchMedia("(hover:hover) and (pointer:fine)").matches) {
     tile.onpointerleave = () => TILT.forEach(name => tile.style.removeProperty(name));
   });
   document.addEventListener("pointermove", e => {
-    const box = e.target.closest && e.target.closest(".card,.queue");
+    const box = e.target.closest && e.target.closest(".card");
     if (!box) return;
     const r = box.getBoundingClientRect();
     box.style.setProperty("--gx", e.clientX - r.left + "px"); box.style.setProperty("--gy", e.clientY - r.top + "px");

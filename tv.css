@@ -1,0 +1,67 @@
+/* RMP.TV page. Loads after theme.css and styles.css. */
+.tv-page{padding-block:24px 64px;max-width:1040px}
+.tv-head{text-align:center;margin-bottom:56px}
+.tv-head h1{font-size:clamp(3rem,10vw,6rem)}
+.tv-head h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none}
+
+/* ---------- the TV set ---------- */
+.set{position:relative}
+.antenna{position:absolute;left:50%;bottom:100%;width:0;height:56px}
+.antenna i{position:absolute;bottom:-2px;left:0;width:3px;height:66px;border-radius:3px;background:linear-gradient(#ffd2ad,#6c5a99);transform-origin:bottom;rotate:-46deg}
+.antenna i:last-child{rotate:40deg}
+.antenna i::after{content:"";position:absolute;top:-5px;left:-3px;width:9px;height:9px;border-radius:50%;background:var(--accent)}
+.cabinet{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:18px;padding:22px 22px 40px;border:2px solid transparent;border-radius:38px;background:linear-gradient(160deg,#2a2444,#120f22 55%,#1c1430) padding-box,var(--grad) border-box;box-shadow:var(--lift),0 0 90px -30px #ff4fa380}
+.bezel{align-self:center;min-width:0;padding:14px;border-radius:28px;background:#05040a;box-shadow:inset 0 0 0 1px #ffffff1a,inset 0 8px 24px #000}
+/* Square corners on the screen itself so nothing clips the player. */
+.screen{position:relative;width:100%;aspect-ratio:16/9;min-height:200px;background:#000}
+.screen iframe,#tvPlayer{position:absolute;inset:0;width:100%;height:100%;border:0}
+.screen:not(.on) #tvPlayer{visibility:hidden}
+.standby{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:12px;text-align:center}
+.standby .bars{position:absolute;inset:0;opacity:.34;background:linear-gradient(90deg,#f6f4ff 0 14.3%,#ffd24a 0 28.6%,#45d6e8 0 42.9%,#52d681 0 57.2%,#ff4fa3 0 71.5%,#ff6b35 0 85.8%,#6a5cff 0)}
+.standby p,.standby a{position:relative}
+.standby p{padding:6px 14px;border-radius:8px;background:#000c;font:700 1rem var(--display)}
+.panel{display:flex;flex-direction:column;align-items:center;gap:18px;padding:16px 10px;border-radius:24px;background:linear-gradient(#ffffff0d,#ffffff03);border:1px solid var(--line)}
+.led{display:flex;align-items:baseline;gap:8px;width:100%;justify-content:center;padding:8px;border-radius:12px;background:#06040b;box-shadow:inset 0 2px 8px #000}
+.led span{font-size:.75rem;color:var(--muted)}
+.led b{font:400 2.2rem/1 var(--poster);color:#ff8a3d;text-shadow:0 0 14px #ff6b35;font-variant-numeric:tabular-nums}
+.knobs{display:flex;flex-direction:column;gap:14px}
+.knob{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;width:72px;height:72px;padding:0;border-radius:50%;color:var(--fg);background:radial-gradient(circle at 35% 30%,#6a5a95,#231c3a 62%,#110d1f);border:3px solid #ffffff26;box-shadow:0 8px 16px #0009}
+.knob small{font-size:.68rem}
+.knob:not(:disabled):hover{border-color:var(--accent)}
+.knob:disabled{opacity:.45;color:var(--muted);background:#1d1a30}
+.grille{flex:1;min-height:60px;width:100%;border-radius:12px;background:repeating-linear-gradient(#0008 0 4px,#ffffff14 4px 6px,transparent 6px 11px)}
+.brand{position:absolute;left:0;right:150px;bottom:8px;text-align:center;font:400 .95rem var(--poster);letter-spacing:.3em;color:var(--muted)}
+.feet{display:flex;justify-content:space-between;padding-inline:12%}
+.feet i{width:20px;height:34px;background:linear-gradient(#3a2f5e,#120f22);clip-path:polygon(0 0,100% 0,65% 100%,35% 100%)}
+
+/* ---------- remote and guide ---------- */
+.remote{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;margin-top:20px;padding:16px 22px;border-radius:24px;background:var(--glass),#100e1be0;border:1px solid var(--line);box-shadow:var(--lift)}
+.remote>div:first-child{min-width:0;flex:1 1 240px}
+.remote small{color:var(--muted)}
+.remote h2{font:800 1.25rem/1.25 var(--display);text-transform:none;overflow-wrap:anywhere}
+.remote-keys{display:flex;flex-wrap:wrap;gap:8px}
+#tvStatus{text-align:center;margin-top:12px}
+.guide{padding-block:40px 0}
+.guide h2{font-size:2rem;margin-bottom:18px}
+.guide-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.program{display:flex;flex-direction:column;gap:4px;padding:10px 10px 14px;text-align:left;border-radius:18px;color:var(--fg);background:var(--glass),#100e1be0;border:1px solid var(--line)}
+.program img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px}
+.program small{color:#ff8a3d;font-weight:600}
+.program b{font-weight:600;overflow-wrap:anywhere}
+.program[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 30px -8px #ff4fa3a6}
+
+@media(max-width:720px){
+  .cabinet{grid-template-columns:minmax(0,1fr);gap:12px;padding:10px 6px 34px;border-radius:22px}
+  .bezel{padding:6px 0;border-radius:14px}
+  .panel{flex-direction:row;justify-content:space-between;padding:10px}
+  .led{width:auto;min-width:92px}
+  .knobs{flex-direction:row-reverse}
+  .knob{width:58px;height:58px}
+  .grille{display:none}
+  .brand{right:0}
+  .tv-head{margin-bottom:48px}
+  .guide-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+}
+/* Keep the heading on one line, and no sparkle beside the video title. */
+.tv-head h1 em{display:inline}
+.remote h2::after{content:none}

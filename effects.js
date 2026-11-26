@@ -1,11 +1,10 @@
-/* Home page animation: logo contour lines, starry sky, spectrum bars and the record.
-   Sound-reactive parts read only RMP's own audio (the analyser set up in app.js), never Spotify.
-   Each part redraws only when it has something new to show. */
+/* Home page animation: logo contour lines and the starry sky.
+   Nothing here reacts to audio. Each part redraws only when it has something new to show. */
 const IDLE_FRAME = 31; // ms between redraws for slow background motion (about 30 per second)
 const stage = $("home"), mark = document.querySelector(".mark"), wavesCanvas = $("waves");
 const sky = createStarfield($("dust"));
 const pt = { x: -999, y: -999 }, aim = { x: 0, y: 0 }, eye = { x: 0, y: 0 };
-let ripples = [], bass = 0, wavesOnScreen = true;
+let ripples = [], wavesOnScreen = true;
 
 /* ---------- pointer ---------- */
 const localPoint = e => { const r = wavesCanvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
@@ -36,10 +35,6 @@ function drawWaves(t) {
   const m = mark.getBoundingClientRect(), c = wavesCanvas.getBoundingClientRect();
   const cx = m.left - c.left + m.width / 2, cy = m.top - c.top + m.height / 2;
 
-  let target = 0;
-  if (an && !player.paused && !calm.matches) { an.getByteFrequencyData(freq); for (let i = 0; i < 10; i++) target += freq[i]; target /= 2550; }
-  bass += (target - bass) * .2;
-
   const now = performance.now(), time = calm.matches ? 0 : t, reach = Math.max(w, h) * .9;
   ripples = ripples.filter(r => now - r.born < 2200);
   eye.x += (aim.x - eye.x) * .06; eye.y += (aim.y - eye.y) * .06;
@@ -53,7 +48,7 @@ function drawWaves(t) {
     for (let i = 0; i <= STEPS; i++) {
       const a = i / STEPS * Math.PI * 2;
       const wobble = Math.sin(a * 3 + k * .23 + time * .00045) * 9 + Math.sin(a * 5 - k * .17 - time * .0003) * 6 + Math.sin(a * 2 + time * .0002) * 14;
-      const r = base + wobble * (.5 + k / 18) + bass * 38 * Math.sin(a * 8 + k * .5 + time * .004);
+      const r = base + wobble * (.5 + k / 18);
       let x = cx + ox + Math.cos(a) * r * .86, y = cy + oy + Math.sin(a) * r;
       const dx = x - pt.x, dy = y - pt.y, d = Math.hypot(dx, dy);
       if (d < 150 && d > 0) { const push = Math.pow(1 - d / 150, 2) * 46; x += dx / d * push; y += dy / d * push; }
@@ -66,51 +61,10 @@ function drawWaves(t) {
     ctx.closePath();
     const bold = k % 7 === 3;
     ctx.lineWidth = .8 + z * 1.5 + (bold ? .8 : 0);
-    ctx.globalAlpha = Math.max(.1, .68 - k / RINGS * .52 + bass * .25 + (bold ? .14 : 0));
+    ctx.globalAlpha = Math.max(.1, .68 - k / RINGS * .52 + (bold ? .14 : 0));
     ctx.stroke();
   }
 }
-
-/* ---------- spectrum bars under the player (a still pattern when not playing) ---------- */
-const BARS = 48;
-let spectrumIdle = ""; // size of the still pattern already on the canvas
-function drawSpectrum() {
-  if (!listening || source !== "rmp") return; // hidden while Spotify is selected
-  const canvas = $("spectrum"), live = an && !player.paused && !calm.matches;
-  const size = canvas.clientWidth + "x" + canvas.clientHeight + "@" + devicePixelRatio;
-  if (!live && size === spectrumIdle) return;
-  spectrumIdle = live ? "" : size;
-  const [ctx, w, h] = fitCanvas(canvas);
-  ctx.clearRect(0, 0, w, h);
-  if (live) an.getByteFrequencyData(freq);
-  ctx.fillStyle = sunsetGradient(ctx, 0, 0, w, 0);
-  ctx.globalAlpha = live ? 1 : .45;
-  for (let i = 0; i < BARS; i++) {
-    const v = live ? freq[Math.floor(i * 1.8)] / 255 : .12 + .45 * Math.abs(Math.sin(i * .5) * Math.cos(i * .19));
-    const height = Math.max(4, v * h);
-    ctx.fillRect(i * w / BARS + 1, (h - height) / 2, Math.max(2, w / BARS - 3), height);
-  }
-}
-
-/* ---------- record: spins while an RMP track plays (never for Spotify); drag it to scrub, about 6 seconds per turn ---------- */
-const disc = $("disc");
-let turn = 0, shownTurn = null, drag = null, lastFrame = 0;
-const angleOf = e => { const r = disc.getBoundingClientRect(); return Math.atan2(e.clientY - r.top - r.height / 2, e.clientX - r.left - r.width / 2) * 180 / Math.PI; };
-function spinRecord(t) {
-  const elapsed = Math.min(60, t - lastFrame || 0); lastFrame = t;
-  if (drag === null && !player.paused && !calm.matches) turn += elapsed * .12;
-  if (turn !== shownTurn) { shownTurn = turn; $("spin").style.transform = "rotate(" + turn + "deg)"; }
-}
-disc.onpointerdown = e => { if (!canScrub()) return; drag = angleOf(e); scrubStart(); disc.setPointerCapture(e.pointerId); };
-disc.onpointermove = e => {
-  if (drag === null) return;
-  const angle = angleOf(e);
-  let step = angle - drag;
-  if (step > 180) step -= 360;
-  if (step < -180) step += 360;
-  drag = angle; turn += step; scrubBy(step / 360 * 6);
-};
-disc.onpointerup = disc.onpointercancel = () => { if (drag === null) return; drag = null; scrubEnd(); };
 
 /* ---------- one animation loop (browsers pause it in background tabs) ---------- */
 let wavesAt = -1e9, skyAt = -1e9, skyScroll = -1, skySize = "", wavesSize = "";
@@ -118,7 +72,7 @@ function frame(t) {
   const size = innerWidth + "x" + innerHeight;
 
   if (wavesOnScreen) {
-    const busy = !calm.matches && (pt.x > -999 || ripples.length || !player.paused || scrollY !== skyScroll);
+    const busy = !calm.matches && (pt.x > -999 || ripples.length || scrollY !== skyScroll);
     const due = calm.matches ? size !== wavesSize || pt.x > -999 || t - wavesAt >= 500 : busy || t - wavesAt >= IDLE_FRAME;
     if (due) { drawWaves(t); wavesAt = t; wavesSize = size; }
   }
@@ -128,8 +82,6 @@ function frame(t) {
   if (skyDue) { sky.draw(t, { still: calm.matches, scroll: scrollY, lean: eye.x, comets: true }); skyAt = t; skySize = size; }
   skyScroll = scrollY;
 
-  drawSpectrum();
-  spinRecord(t);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);

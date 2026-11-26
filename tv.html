@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RMP.TV | Remunerative Media Productions</title>
+<meta name="description" content="RMP.TV: watch videos from Remunerative Media Productions, the creative media company based in Huntsville, AL and Atlanta, GA.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://loss23.github.io/RMPro/tv.html">
+<meta property="og:image" content="https://loss23.github.io/RMPro/images/logo.jpg">
+<meta property="og:site_name" content="Remunerative Media Productions">
+<meta property="og:title" content="RMP.TV | Remunerative Media Productions">
+<meta property="og:description" content="Videos from Remunerative Media Productions. Huntsville, AL and Atlanta, GA.">
+<meta name="theme-color" content="#04030a">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="tv.css">
+</head>
+<body>
+<div class="sky" aria-hidden="true"><i></i><i></i><i></i></div><canvas id="dust" aria-hidden="true"></canvas>
+<header><div class="wrap"><nav aria-label="Main">
+<a class="logo" href="index.html">RMP</a><div class="links"><a href="index.html#listen">Listen</a><a href="tv.html" aria-current="page">RMP.TV</a><a href="index.html#artists">Artists</a><a href="index.html#shows">Shows</a><a href="index.html#merch">Merch</a><a href="index.html#about">About</a><a href="visualizer.html">Visualizer</a></div>
+</nav></div></header>
+<main class="wrap tv-page">
+<div class="tv-head"><h1>RMP<em>.TV</em></h1><p class="sub">Videos from Remunerative Media Pro on YouTube.</p></div>
+
+<div class="set">
+<div class="antenna" aria-hidden="true"><i></i><i></i></div>
+<div class="cabinet">
+<div class="bezel"><div class="screen" id="screen">
+<div id="tvPlayer"></div>
+<div class="standby" id="standby"><div class="bars" aria-hidden="true"></div><p id="standbyText">Tuning in…</p><a class="btn" id="standbyLink" target="_blank" rel="noopener">Watch on YouTube</a></div>
+</div></div>
+<div class="panel">
+<p class="led"><span>CH</span><b id="channelNo">--</b></p>
+<div class="knobs"><button type="button" class="knob" id="chUp" disabled><span aria-hidden="true">▲</span><small>CH +</small></button><button type="button" class="knob" id="chDown" disabled><span aria-hidden="true">▼</span><small>CH −</small></button></div>
+<div class="grille" aria-hidden="true"></div>
+</div>
+<p class="brand" aria-hidden="true">RMP.TV</p>
+</div>
+<div class="feet" aria-hidden="true"><i></i><i></i></div>
+</div>
+
+<div class="remote">
+<div><small>Now showing</small><h2 id="nowTitle" aria-live="polite">RMP.TV</h2></div>
+<div class="remote-keys"><button type="button" id="play" disabled>Play</button><button type="button" class="ghost" id="mute" disabled aria-pressed="false">Mute</button><a class="btn ghost" id="channelLink" target="_blank" rel="noopener">YouTube channel</a></div>
+</div>
+<p class="sub" id="tvStatus" aria-live="polite"></p>
+
+<section class="guide" id="guide" aria-labelledby="guideTitle" hidden><h2 id="guideTitle">Channel guide</h2><div class="guide-grid" id="guideList"></div></section>
+</main>
+<footer><div class="wrap"><span>Remunerative Media Productions · Huntsville, AL · Atlanta, GA</span><a class="footer-mail" href="mailto:Remunerativerecords@gmail.com">Remunerativerecords@gmail.com</a><div class="social"><a class="btn ghost" href="https://www.instagram.com/remmediapro/" target="_blank" rel="noopener">Instagram</a><a class="btn ghost" href="https://www.youtube.com/@rrmediapro" target="_blank" rel="noopener">YouTube</a></div><a href="index.html">RMP home</a></div></footer>
+
+<script src="config.js"></script>
+<script src="shared.js"></script>
+<script src="tv.js"></script>
+</body>
+</html>

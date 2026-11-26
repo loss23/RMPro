@@ -4,6 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Remunerative Media Productions</title>
+<meta name="description" content="Remunerative Media Productions (RMP) is a creative media company in Huntsville, AL and Atlanta, GA. Hear RMP artists, see upcoming shows, watch RMP.TV and shop merch.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://loss23.github.io/RMPro/">
+<meta property="og:image" content="https://loss23.github.io/RMPro/images/logo.jpg">
+<meta property="og:site_name" content="Remunerative Media Productions">
+<meta property="og:title" content="Remunerative Media Productions">
+<meta property="og:description" content="Remunerative Media Productions (RMP) is a creative media company in Huntsville, AL and Atlanta, GA. Hear RMP artists, see upcoming shows, watch RMP.TV and shop merch.">
+<meta name="theme-color" content="#04030a">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +25,7 @@
 <body>
 <div class="sky" aria-hidden="true"><i></i><i></i><i></i></div><canvas id="dust" aria-hidden="true"></canvas>
 <header><div class="wrap"><nav aria-label="Main">
-<a class="logo" href="#home">RMP</a><div class="links"><a href="#listen">Listen</a><a href="#artists">Artists</a><a href="#shows">Shows</a><a href="#merch">Merch</a><a href="#about">About</a><a href="visualizer.html">Visualizer</a></div>
+<a class="logo" href="#home">RMP</a><div class="links"><a href="#listen">Listen</a><a href="tv.html">RMP.TV</a><a href="#artists">Artists</a><a href="#shows">Shows</a><a href="#merch">Merch</a><a href="#about">About</a><a href="visualizer.html">Visualizer</a></div>
 <div class="progress" id="progress" aria-hidden="true"></div></nav></div></header>
 <main>
 <div class="stage" id="home"><canvas id="waves" aria-hidden="true"></canvas><div class="hero wrap"><div>
@@ -22,27 +33,27 @@
 <div class="cities"><span>Huntsville, AL</span><span>Atlanta, GA</span></div>
 <h1><span>Remunerative</span> <em>Media Productions</em></h1>
 <p>A joint venture production team in Huntsville, Alabama and Atlanta, Georgia, supporting artists in music and media.</p>
-<div class="actions"><button type="button" id="heroPlay">Play music</button><a class="btn ghost" href="#artists">Meet the artists</a></div><p class="hint">Move across the lines, or click to send a ripple.</p></div>
+<div class="actions"><a class="btn" href="#listen">Listen now</a><a class="btn ghost" href="#artists">Meet the artists</a></div><p class="hint">Move across the lines, or click to send a ripple.</p></div>
 <img class="mark" src="images/logo.jpg" width="360" height="360" alt="RMP logo: Remunerative Media Production"></div></div>
 <div class="ticker" id="ticker" role="group" aria-label="RMP artists"><div class="reel"><div class="run" id="run"></div></div><button type="button" class="stop" id="stopRun" aria-pressed="false">Pause</button></div>
 
 <div class="wrap">
 <section id="listen" data-word="Sound"><div class="head"><h2>Listen</h2></div>
-<div class="console">
-<div class="tabs" role="group" aria-label="Music source"><button type="button" id="tabMine" aria-pressed="true">RMP tracks</button><button type="button" id="tabSp" aria-pressed="false">Spotify</button></div>
-<div class="now"><div class="meta"><div class="disc" id="disc" title="Drag the record to scrub" aria-hidden="true"><div class="spin" id="spin"><div class="cover" id="cover">RMP</div><b></b></div><i></i></div><div class="now-text"><h3 id="nowTitle">Pick a track</h3><p class="sub" id="now" aria-live="polite"></p></div></div>
-<canvas id="spectrum" aria-hidden="true"></canvas>
-<div id="spPane" hidden><div id="spHost"></div><p class="sub" id="spStatus" aria-live="polite"></p></div>
-<p class="sub scrub-hint" id="scrubHint">Drag the record to scrub through a song.</p>
-<div class="seek"><span id="elapsed">0:00</span><input type="range" id="seek" min="0" max="1000" value="0" aria-label="Seek" disabled><span id="total">0:00</span></div>
-<div class="controls">
-<button type="button" class="round ghost" id="prev" aria-label="Previous track"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zm14 0v14L9 12z"/></svg></button>
+<div class="radio">
+<div class="radio-top"><p><b>RMP Radio</b> <span>Pick a channel</span></p><a href="visualizer.html">Open the visualizer</a></div>
+<div class="channels" id="spList" role="group" aria-label="Artist channels"></div>
+<div class="tuned">
+<div class="poster"><div class="poster-art" id="posterArt" aria-hidden="true"></div><p class="channel-no" id="channelNo" aria-hidden="true"></p><div class="poster-name"><p>Now tuned to</p><h3 id="nowTitle" aria-live="polite">RMP Radio</h3></div></div>
+<div class="relay">
+<div class="viewport"><div id="spHost"></div>
+<div class="profile-only" id="profileCard" hidden><p class="lead" id="profileTitle"></p><p class="sub">Spotify profiles can’t play inside this page.</p><a class="btn" id="profileLink" href="#listen" target="_blank" rel="noopener">Open Spotify profile</a></div></div>
+<p class="sub" id="spStatus" aria-live="polite"></p>
+<div class="deck"><div class="controls">
+<button type="button" class="round ghost" id="prev" aria-label="Previous artist"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zm14 0v14L9 12z"/></svg></button>
 <button type="button" class="round big" id="toggle" aria-label="Play"></button>
-<button type="button" class="round ghost" id="next" aria-label="Next track"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5l11 7-11 7z"/></svg></button></div>
-<audio id="player" preload="metadata"></audio></div>
-<div class="queue">
-<div class="panel" id="minePanel"><ul id="tracks"></ul><a class="btn ghost" href="visualizer.html">Open the visualizer</a></div>
-<div class="panel" id="spPanel" hidden><div class="sp-list" id="spList"></div></div></div></div>
+<button type="button" class="round ghost" id="next" aria-label="Next artist"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5l11 7-11 7z"/></svg></button></div>
+<div class="seek"><span id="elapsed">0:00</span><input type="range" id="seek" min="0" max="1000" value="0" aria-label="Seek" disabled><span id="total">0:00</span></div></div>
+</div></div></div>
 </section>
 
 <section id="artists" data-word="Roster"><div class="head"><h2>Artists</h2><p class="sub">Select an artist to open their profile.</p></div><div class="chips" id="chips" role="group" aria-label="Highlight artists by style"></div><div class="artists" id="artistList"></div></section>
@@ -51,10 +62,10 @@
 <section id="past" data-word="Replay"><div class="head"><h2>Past shows</h2><p class="sub">Select an opener to meet the artist.</p></div><ul id="pastList"></ul></section>
 <section id="merch" data-word="Wear"><div class="head"><h2>Merch</h2><p class="sub" id="merchNote" aria-live="polite"></p></div><div class="grid" id="merchList"></div>
 <div id="cart" class="cart" hidden><h3>Your cart</h3><ul id="cartLines"></ul><p id="cartTotal"></p><p class="sub">Taxes and shipping are calculated at checkout.</p><a class="btn" id="checkout" href="#merch" target="_blank" rel="noopener">Check out on Shopify</a></div><p id="cartMsg" role="status"></p></section>
-<section id="about" data-word="RMP"><div class="head"><h2>About and booking</h2></div><div class="about"><div><p class="lead">RMP is dedicated to cultivating creativity. Our goal is to become the leading media organization in our city, reach broad audiences and help our partners achieve their goals.</p><p class="sub">Booking details are coming soon. Follow RMP:</p><div class="social"><a class="btn ghost" href="https://www.instagram.com/remmediapro/" target="_blank" rel="noopener">Instagram</a><a class="btn ghost" href="https://www.youtube.com/@rrmediapro" target="_blank" rel="noopener">YouTube</a></div></div>
+<section id="about" data-word="RMP"><div class="head"><h2>About and booking</h2></div><div class="about"><div><p class="lead">RMP is dedicated to cultivating creativity. Our goal is to become the leading media organization in our city, reach broad audiences and help our partners achieve their goals.</p><p class="email"><span>General email</span> <a href="mailto:Remunerativerecords@gmail.com">Remunerativerecords@gmail.com</a></p><p class="sub">Booking details are coming soon. Follow RMP:</p><div class="social"><a class="btn ghost" href="https://www.instagram.com/remmediapro/" target="_blank" rel="noopener">Instagram</a><a class="btn ghost" href="https://www.youtube.com/@rrmediapro" target="_blank" rel="noopener">YouTube</a></div></div>
 <div><details open name="work"><summary>Media campaigns</summary><p>Campaigns that showcase our roster of artists.</p></details><details name="work"><summary>Photography</summary><p>Photo work featuring our artists.</p></details><details name="work"><summary>Fashion</summary><p>Exclusive fashion content featuring our artists.</p></details></div></div></section>
 </div></main>
-<footer><div class="wrap"><span>Remunerative Media Productions · Huntsville, AL · Atlanta, GA</span><div class="social"><a class="btn ghost" href="https://www.instagram.com/remmediapro/" target="_blank" rel="noopener">Instagram</a><a class="btn ghost" href="https://www.youtube.com/@rrmediapro" target="_blank" rel="noopener">YouTube</a></div><a href="#home">Back to top</a></div></footer>
+<footer><div class="wrap"><span>Remunerative Media Productions · Huntsville, AL · Atlanta, GA</span><a class="footer-mail" href="mailto:Remunerativerecords@gmail.com">Remunerativerecords@gmail.com</a><div class="social"><a class="btn ghost" href="https://www.instagram.com/remmediapro/" target="_blank" rel="noopener">Instagram</a><a class="btn ghost" href="https://www.youtube.com/@rrmediapro" target="_blank" rel="noopener">YouTube</a></div><a href="#home">Back to top</a></div></footer>
 
 <div class="dock" id="dock" hidden><div><div class="cover" id="dockCover">RMP</div><a href="#listen"><b id="dockTitle"></b><small id="dockArtist"></small></a><button type="button" class="round" id="dockToggle" aria-label="Play"></button></div></div>
 <dialog id="poster" aria-label="Show flyer"><button type="button" class="ghost" id="posterClose">Close</button><img id="posterImg" alt=""></dialog>

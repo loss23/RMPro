@@ -1,5 +1,5 @@
 /* RMP home page. Shared colors and base rules are in theme.css.
-   Order: base, background, nav, hero, ticker, player, artists, collaborators, shows, merch, about, overlays, screen sizes. */
+   Order: base, background, nav, hero, ticker, Spotify player, artists, collaborators, shows, merch, about, overlays, screen sizes. */
 
 /* ---------- base ---------- */
 html{scroll-behavior:smooth;overflow-x:clip}
@@ -22,11 +22,12 @@ button:disabled{background:var(--raise);color:var(--muted);cursor:default}
 button.ghost:hover,a.btn.ghost:hover{box-shadow:none}
 
 /* Frosted panels. They are nearly opaque instead of blurred, which keeps scrolling smooth over the animated sky. */
-.console,.event,.card,.cart,.empty,.collab,.recap{background:var(--glass),#100e1be0;border:1px solid var(--line);box-shadow:var(--lift)}
+.event,.card,.cart,.empty,.collab,.recap{background:var(--glass),#100e1be0;border:1px solid var(--line);box-shadow:var(--lift)}
 
 /* ---------- background ---------- */
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:30}
-body::after{content:"";position:fixed;inset:0;z-index:40;pointer-events:none;opacity:.09;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+/* The grain stays behind the content so it never covers an embedded player. */
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.09;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 .sky{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
 .sky::before{content:"";position:absolute;inset:-30%;transform:rotate(-24deg);background:radial-gradient(ellipse 55% 9% at 50% 50%,#b9a3ff2e,transparent),radial-gradient(ellipse 28% 13% at 36% 48%,#ff4fa31f,transparent),radial-gradient(ellipse 24% 11% at 68% 53%,#4f6bff24,transparent),radial-gradient(ellipse 70% 20% at 50% 50%,#4c2a8f26,transparent)}
 .sky::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 85% 75% at 50% 45%,transparent 45%,#000a)}
@@ -90,53 +91,58 @@ h2::after{content:"✦";font-size:.4em;vertical-align:top;margin-left:.3em;backg
 .rise.in{opacity:1;translate:0 0;transform:none;transition:opacity .7s ease,translate .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
 /* Soft light that follows the mouse across these panels. */
 .card{background:radial-gradient(320px circle at var(--gx,-999px) var(--gy,-999px),#a875ff2e,transparent 70%),var(--glass),#100e1be0}
-.queue{background:radial-gradient(320px circle at var(--gx,-999px) var(--gy,-999px),#a875ff24,transparent 70%)}
 
-/* ---------- player ---------- */
-.console{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);border-radius:28px;overflow:hidden}
-.now{border-top:1px solid var(--line);position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;gap:18px;min-width:0;padding:28px;background:linear-gradient(160deg,#8b5cf62e,transparent 65%)}
-.now::before{content:"";position:absolute;inset:-70px;z-index:-1;background:var(--art,none) center/cover;filter:blur(60px) saturate(1.7);opacity:.3}
-.meta{display:flex;gap:18px;align-items:center;min-width:0}
-.now-text{min-width:0}
-.meta h3{font-size:1.9rem;overflow-wrap:anywhere}
-.cover{width:112px;height:112px;flex:none;border-radius:16px;object-fit:cover;background:var(--raise) center/cover;display:grid;place-items:center;font:800 1.5rem var(--display);color:var(--accent)}
-.disc{position:relative;flex:none;width:176px;height:176px;border-radius:50%;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;background:repeating-radial-gradient(circle,#050505 0 2px,#1d1d1f 3px 4px);box-shadow:0 0 0 1px #ffffff1f,0 6px 10px #0008,0 28px 40px -8px #000d,0 0 60px -10px #8b5cf699}
-.disc:active{cursor:grabbing}
-.disc::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 20deg,transparent,#ffffff24 35deg,transparent 80deg,transparent 180deg,#ffffff24 215deg,transparent 260deg);pointer-events:none}
-.disc .cover{position:absolute;inset:23%;width:54%;height:54%;border-radius:50%;font-size:1.1rem;pointer-events:none}
-.disc i{position:absolute;inset:47%;border-radius:50%;background:var(--bg);z-index:1}
-.disc b{position:absolute;left:50%;top:5%;width:3px;height:11%;background:var(--pink);border-radius:3px}
-.spin{position:absolute;inset:0;border-radius:50%}
-#spectrum{width:100%;height:96px;display:block}
-.now .scrub-hint{font-size:.85rem;text-align:center}
-.seek{display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
-input[type=range]{accent-color:var(--accent);flex:1;min-width:0;cursor:pointer}
-.controls{display:flex;align-items:center;justify-content:center;gap:14px}
-.round{width:48px;height:48px;padding:0;display:grid;place-items:center;border-radius:50%}
-.round svg{width:20px;height:20px;fill:currentColor}
-.round.big{width:68px;height:68px;box-shadow:0 0 0 8px #ff4fa31a,0 16px 34px -10px #ff4fa3b3}
-.round.big svg{width:28px;height:28px}
-.queue{display:flex;flex-direction:column;gap:6px;min-width:0;padding:20px;border-left:1px solid var(--line)}
-.queue .btn{margin-top:auto;text-align:center}
-.track{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:transparent;color:var(--fg);border-radius:16px;padding:10px}
-.track:hover{background:#ffffff0d}
-button.track:hover{box-shadow:none}
-.track[aria-current="true"],button.track[aria-current="true"]:hover{background:linear-gradient(100deg,#ff6b3526,#8b5cf626);border-color:#ff6b8a8c;box-shadow:0 10px 24px -14px #000}
-.track .cover{width:52px;height:52px;border-radius:10px;font-size:.8rem}
-.track b{display:block;font-size:1rem}
-.track small{color:var(--muted);font-weight:400}
-.track .time{margin-left:auto;color:var(--muted);font-weight:400;font-size:.85rem}
-.tabs{grid-column:1/-1;justify-self:center;display:flex;gap:4px;width:min(360px,calc(100% - 32px));margin:16px 0;padding:4px;border:1px solid var(--line);border-radius:99px}
-.tabs button{flex:1;padding:9px 12px;color:var(--muted);background:transparent}
-.tabs button:hover{box-shadow:none}
-.tabs button[aria-pressed="true"]{color:var(--bg);background:var(--fg)}
-.panel{display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
-.sp-list{display:flex;flex-direction:column;gap:6px}
-.sp-list .track[aria-pressed="true"],.sp-list button.track[aria-pressed="true"]:hover{background:linear-gradient(100deg,#ff6b3526,#8b5cf626);border-color:#ff6b8a8c}
-#spPane{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0;text-align:center}
-#spHost{align-self:stretch;min-height:152px;border-radius:12px;background:#0b0914}
+/* ---------- RMP Radio: the frame around Spotify's player ---------- */
+.radio{padding:18px;border:1px solid transparent;border-radius:32px;background:radial-gradient(ellipse 55% 45% at 100% 0,#8b5cf638,transparent) padding-box,radial-gradient(ellipse 50% 45% at 0 100%,#ff4fa326,transparent) padding-box,linear-gradient(#0d0a18,#0d0a18) padding-box,var(--grad) border-box;box-shadow:var(--lift),0 0 70px -28px #ff4fa3a6}
+.radio-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 16px;padding:2px 6px 16px}
+.radio-top b{font:400 1.7rem/1.1 var(--poster);text-transform:uppercase;letter-spacing:.02em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.radio-top span,.radio-top a{color:var(--muted);font-size:.9rem}
+.radio-top span{margin-left:10px}
+.radio-top a:hover{color:var(--fg)}
+/* Channel buttons, each with the artist as a small ringed planet. */
+.channels{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:14px}
+.channels:empty{display:none}
+.channel{display:flex;align-items:center;gap:14px;min-width:0;text-align:left;color:var(--fg);background:#ffffff08;border-color:var(--line);border-radius:99px;padding:8px 18px 8px 8px}
+button.channel:hover{box-shadow:none;border-color:#a875ff99}
+.channel[aria-pressed="true"],button.channel[aria-pressed="true"]:hover{background:linear-gradient(#171127,#171127) padding-box,var(--grad) border-box;border-color:transparent;box-shadow:0 10px 28px -12px #ff4fa3cc}
+.channel small{display:block;font-size:.7rem;font-weight:600;color:var(--muted)}
+.channel[aria-pressed="true"] small{color:#ffb3d5}
+.channel b{display:block;font:700 1.05rem/1.25 var(--display);overflow-wrap:anywhere}
+.orb{position:relative;flex:none;width:54px;height:54px;border-radius:50%;overflow:hidden;display:grid;place-items:center;font:800 1rem var(--display);color:#fff;box-shadow:0 0 0 2px #0d0a18,0 0 0 3px #ffffff40}
+.channel[aria-pressed="true"] .orb{box-shadow:0 0 0 2px #0d0a18,0 0 0 4px var(--pink)}
+.orb img,.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tuned{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:14px}
+/* Poster of the tuned artist, with still orbit rings that echo the logo. */
+.poster{position:relative;isolation:isolate;overflow:hidden;min-height:480px;border-radius:20px;background:#0b0914}
+.poster-art{position:absolute;inset:0;display:grid;place-items:center;font:800 clamp(4rem,10vw,7rem) var(--display);color:#fff}
+.poster-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.poster::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:repeating-radial-gradient(circle at 100% 0,transparent 0 25px,#ffffff24 26px 27px);-webkit-mask-image:radial-gradient(circle at 100% 0,#000,transparent 70%);mask-image:radial-gradient(circle at 100% 0,#000,transparent 70%)}
+.poster::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(#0000 45%,#0b0914f2),linear-gradient(135deg,#7c3aed40,transparent 45%,#ff6b3526)}
+.channel-no{position:absolute;z-index:2;top:8px;left:18px;font:400 5.5rem/1.1 var(--poster);color:transparent;-webkit-text-stroke:2px #fff}
+.poster-name{position:absolute;z-index:2;inset:auto 0 0;padding:22px}
+.poster-name p{font-size:.85rem;font-weight:600;color:#ffb3d5}
+.poster-name h3{font:400 clamp(2.8rem,6vw,4.8rem)/1 var(--poster);text-transform:none;overflow-wrap:anywhere;text-shadow:0 10px 30px #000c}
+.poster-name h3::after{content:"";display:block;width:84px;height:5px;margin-top:12px;border-radius:99px;background:var(--grad)}
+/* Spotify's own player sits untouched in a plain frame; our controls sit below it. */
+.relay{display:flex;flex-direction:column;gap:12px;min-width:0}
+.viewport{padding:10px;border-radius:20px;background:var(--glass),#0b0914;border:1px solid var(--line)}
+#spHost{min-height:352px;border-radius:12px;overflow:hidden}
+#spHost iframe{display:block}
+#spHost:empty{display:grid;place-items:center;color:var(--muted)}
+#spHost:empty::before{content:"Spotify player"}
+.profile-only{min-height:352px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;padding:24px;text-align:center;border-radius:12px;background:radial-gradient(circle,#8b5cf633,transparent 70%)}
+.relay .sp-out[hidden]{display:none}
+#spStatus{text-align:center;font-size:.9rem}
 #spStatus:empty{display:none}
-.sp-out{font-size:.9rem}
+.relay .sp-out{align-self:center;font-size:.9rem}
+.deck{margin-top:auto;display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding:14px 20px;border-radius:99px;background:linear-gradient(160deg,#ffffff14,#1d1a30);border:1px solid var(--line);box-shadow:inset 0 1px 0 #ffffff1f,0 18px 30px -18px #000}
+.controls{display:flex;align-items:center;justify-content:center;gap:14px}
+.seek{flex:1;min-width:200px;display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+input[type=range]{accent-color:var(--accent);flex:1;min-width:0;cursor:pointer}
+.round{width:46px;height:46px;padding:0;display:grid;place-items:center;border-radius:50%}
+.round svg{width:20px;height:20px;fill:currentColor}
+.round.big{width:64px;height:64px;box-shadow:0 0 0 6px #ff4fa31a,0 14px 28px -10px #ff4fa3b3}
+.round.big svg{width:28px;height:28px}
 
 /* ---------- artists (the main feature) ---------- */
 #artists h2{font-size:clamp(3.6rem,12vw,8.4rem)}
@@ -172,11 +178,13 @@ button.track:hover{box-shadow:none}
 .face{position:relative;flex:none;width:60px;height:80px;border-radius:12px;overflow:hidden;display:grid;place-items:center;font:400 1.4rem var(--poster);color:#fff;background:radial-gradient(circle at 32% 28%,#ffb08a,#ff4fa3 38%,#6d35c9 68%,#1a0d38)}
 .face img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .who{min-width:0;margin-right:auto;line-height:1.35}
-.who h3{font-size:1.05rem}
+.who h3{font-size:1.05rem;overflow-wrap:anywhere}
 .who p{color:var(--muted);font-size:.82rem;overflow-wrap:anywhere}
 .collab .btn{flex:none;padding:7px 14px;font-size:.8rem}
-/* The featured card has its own row, a gradient edge and a little more size. */
-.collabs .featured{flex:none;width:min(440px,100%);margin-inline:calc((100% - min(440px,100%))/2);padding:14px 16px 14px 14px;border-color:transparent;background:linear-gradient(#16122a,#16122a) padding-box,var(--grad) border-box;box-shadow:var(--lift),0 0 44px -16px #ff4fa3b3}
+/* Featured cards come first on their own row, with a gradient edge and a little more size. */
+.collabs::before{content:"";order:1;flex-basis:100%;height:0;margin-top:-12px}
+.collab:not(.featured){order:2;width:min(360px,100%)}
+.collabs .featured{flex:none;width:min(440px,100%);padding:14px 16px 14px 14px;border-color:transparent;background:linear-gradient(#16122a,#16122a) padding-box,var(--grad) border-box;box-shadow:var(--lift),0 0 44px -16px #ff4fa3b3}
 .featured .face{width:90px;height:120px;font-size:1.8rem}
 .featured .who h3{font-size:1.35rem}
 .badge{display:inline-block;margin-bottom:2px;font-size:.72rem;font-weight:600;color:#ffb3d5}
@@ -246,6 +254,10 @@ li.row span{display:block;color:var(--muted)}
 .about{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:32px;align-items:start}
 .lead{font:500 clamp(1.3rem,2.6vw,1.8rem)/1.4 var(--display)}
 .about .sub{margin-top:24px}
+.email{margin-top:24px}
+.email span{display:block;color:var(--muted);font-size:.85rem}
+.email a,.footer-mail{overflow-wrap:anywhere}
+.email a{font:700 1.15rem/1.4 var(--display)}
 details{border-bottom:1px solid var(--line)}
 summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:16px;padding:20px 0;font:800 1.25rem var(--display)}
 summary::-webkit-details-marker{display:none}
@@ -261,7 +273,7 @@ footer .social .btn{padding:6px 16px;font-size:.85rem}
 /* ---------- mini player and pop-ups ---------- */
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:25;pointer-events:none;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .dock>div{pointer-events:auto;max-width:620px;margin:auto;display:flex;align-items:center;gap:12px;padding:8px 10px;background:#1d1a30e6;border:1px solid var(--line);border-radius:99px;box-shadow:var(--lift);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
-.dock .cover{width:46px;height:46px;border-radius:50%;font-size:.75rem}
+.dock .cover{position:relative;flex:none;width:46px;height:46px;border-radius:50%;overflow:hidden;display:grid;place-items:center;font:800 .75rem var(--display);color:#fff;background:var(--raise)}
 .dock a{text-decoration:none;min-width:0;margin-right:auto;line-height:1.3}
 .dock b,.dock small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dock small{color:var(--muted)}
@@ -283,8 +295,8 @@ dialog::backdrop{background:#000b;backdrop-filter:blur(6px)}
 
 /* ---------- screen sizes (largest first) ---------- */
 @media(max-width:900px){
-  .console,.about,.recap{grid-template-columns:minmax(0,1fr)}
-  .queue{border-left:0;border-top:1px solid var(--line)}
+  .tuned,.about,.recap{grid-template-columns:minmax(0,1fr)}
+  .poster{min-height:380px}
   .artists>.artist{width:calc((100% - 16px)/2)}
   .artists .label b{font-size:1.6rem}
 }
@@ -298,12 +310,16 @@ dialog::backdrop{background:#000b;backdrop-filter:blur(6px)}
   .mark{order:-1;width:min(240px,70%)}
   section{scroll-margin-top:92px}
   section::before{top:30px}
-  .now{padding:20px}
-  .meta{gap:14px}
-  .meta h3{font-size:1.5rem}
-  .cover{width:84px;height:84px}
-  .disc{width:128px;height:128px}
-  .disc .cover{font-size:.8rem}
+  .radio{padding:12px;border-radius:26px}
+  .channels{grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:8px}
+  .channel{flex-direction:column;gap:6px;text-align:center;border-radius:20px;padding:10px 4px}
+  .channel b{font-size:.82rem}
+  .orb{width:48px;height:48px}
+  .poster{min-height:300px}
+  .channel-no{font-size:3.8rem}
+  .viewport{padding:6px}
+  .deck{flex-direction:column;border-radius:24px;padding:16px}
+  .seek{align-self:stretch;flex:none;min-width:0}
   .artists>.artist:nth-child(even){margin-top:10px}
   .event{grid-template-columns:minmax(0,1fr);padding:16px;gap:20px}
   .flyer{width:min(300px,100%);justify-self:center}
@@ -324,6 +340,10 @@ dialog::backdrop{background:#000b;backdrop-filter:blur(6px)}
   .story{padding:22px}
 }
 @media(max-width:380px){
+  /* Narrow phones: the Instagram button drops under the name. */
+  .collab{flex-wrap:wrap}
+  .who{flex:1 1 0}
+  .collab .btn{flex-basis:100%;text-align:center}
   nav{padding-inline:8px}
   .links a{font-size:.74rem;padding:6px 2px}
   .artists>.artist{width:100%}
