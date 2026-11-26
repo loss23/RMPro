@@ -26,6 +26,8 @@ A password-protected store may block checkout until the password is removed.
 
 ## RMP.TV
 `tv.html` is a TV-style page around YouTube's own player. Settings are `youtube` in `config.js`.
+- The screen is a standard YouTube embed. The remote and channel guide connect to it afterwards; if they cannot,
+  the video still plays with YouTube's own controls. After changing `tv.js`, raise the `?v=` number in `tv.html`.
 - With `videos` empty it loads the channel's uploads list, so new public uploads should appear without editing the site.
 - To pick videos yourself, add `{ title, link }` entries to `videos`. Titles you type show in the channel guide right away;
   with the automatic list, a video's title appears after it has been tuned in.

@@ -1,4 +1,6 @@
 /* RMP.TV: a TV-style frame and remote around YouTube's own embedded player. Settings: RMP_CONFIG.youtube in config.js.
+   The video is a plain YouTube embed that works by itself. The remote and channel guide connect to it afterwards,
+   and the screen is never hidden if they cannot.
    YouTube does not allow anything to be drawn over its player, so all the TV styling sits around the screen. */
 const $ = id => document.getElementById(id);
 const tvSettings = (window.RMP_CONFIG || {}).youtube || {};
@@ -14,7 +16,7 @@ function videoId(link) {
 const picked = (tvSettings.videos || []).map(v => ({ id: videoId(v.link), title: v.title || "" })).filter(v => v.id);
 const uploads = /^UC[\w-]{22}$/.test(tvSettings.channelId || "") ? "UU" + tvSettings.channelId.slice(2) : "";
 
-let player = null, ready = false, ids = [], current = 0, waiting = 0, listWait = 0;
+let player = null, ready = false, ids = [], current = 0;
 const titles = new Map(picked.map(v => [v.id, v.title]));
 const two = n => String(n).padStart(2, "0");
 
@@ -59,23 +61,24 @@ function showNow() {
   });
 }
 
-/* The playlist arrives a moment after the player is ready. */
+/* The video list arrives a moment after the remote connects. Channels and the guide need it. */
 function readList() {
   const list = (player.getPlaylist && player.getPlaylist()) || [];
   if (!list.length) return false;
   if (list.join() !== ids.join()) { ids = list.slice(); drawGuide(); }
   const at = player.getPlaylistIndex ? player.getPlaylistIndex() : 0;
   if (at >= 0) current = at;
-  ["chUp", "chDown", "play", "mute"].forEach(k => $(k).disabled = false);
-  powerOn(); clearTimeout(waiting);
+  $("chUp").disabled = $("chDown").disabled = false;
+  $("tvStatus").textContent = "";
   showNow();
   return true;
 }
 
+const SCREEN_HINT = "Use the controls on the screen to play and change videos.";
 function pollList(tries) {
-  if (readList()) return;
-  if (tries > 0) listWait = setTimeout(pollList, 500, tries - 1);
-  else standby("The video list could not load here. Watch on YouTube instead.");
+  if (ids.length || readList()) return;
+  if (tries > 0) setTimeout(pollList, 500, tries - 1);
+  else $("tvStatus").textContent = SCREEN_HINT;
 }
 
 function tune(i) {
@@ -96,36 +99,64 @@ $("mute").onclick = () => {
   $("mute").setAttribute("aria-pressed", String(mute));
 };
 
-function startPlayer() {
-  const vars = { playsinline: 1, rel: 0 };
-  if (!picked.length) Object.assign(vars, { listType: "playlist", list: uploads });
+/* The same kind of address YouTube's own "Embed" button gives. enablejsapi lets the remote connect. */
+function embedAddress() {
+  const query = new URLSearchParams({ playsinline: "1", rel: "0", enablejsapi: "1" });
+  if (/^https?:$/.test(location.protocol)) query.set("origin", location.origin);
+  let path = "videoseries";
+  if (picked.length) {
+    path = picked[0].id;
+    if (picked.length > 1) query.set("playlist", picked.slice(1).map(v => v.id).join(","));
+  } else query.set("list", uploads);
+  return "https://www.youtube.com/embed/" + path + "?" + query;
+}
+
+function showVideo() {
+  const frame = document.createElement("iframe");
+  frame.id = "tvPlayer";
+  frame.title = "RMP.TV video player";
+  frame.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+  frame.allowFullscreen = true;
+  frame.referrerPolicy = "strict-origin-when-cross-origin"; // YouTube refuses to play without knowing the site
+  frame.src = embedAddress();
+  $("tvPlayer").replaceWith(frame);
+  powerOn();
+}
+
+/* Some previews do not allow other sites inside a page. Say so instead of leaving a blank screen. */
+document.addEventListener("securitypolicyviolation", e => {
+  if (/^(frame|child)-src/.test(e.effectiveDirective) && /youtube/.test(e.blockedURI))
+    standby("This preview blocks YouTube. Open the published site, or watch on YouTube.");
+});
+
+function connectRemote() {
   player = new YT.Player("tvPlayer", {
-    host: "https://www.youtube-nocookie.com", width: "100%", height: "100%", playerVars: vars,
     events: {
       onReady() {
         ready = true;
-        if (picked.length) player.cuePlaylist(picked.map(v => v.id));
-        powerOn(); // the player must never sit underneath the standby card
+        $("play").disabled = $("mute").disabled = false;
         pollList(16);
       },
       onStateChange(e) {
         readList();
         $("play").textContent = e.data === 1 ? "Pause" : "Play";
-        if (e.data === 1) $("tvStatus").textContent = "";
+        if (e.data === 1 && ids.length) $("tvStatus").textContent = "";
       },
-      onError() { $("tvStatus").textContent = "This video can’t play here. Change the channel or watch it on YouTube."; }
+      onError() { $("tvStatus").textContent = "This video can’t play here. Change the video or watch it on YouTube."; }
     }
   });
 }
 
 if (!picked.length && !uploads) standby("No videos are set up yet.");
+else if (location.protocol === "file:") standby("YouTube can’t play from a file opened directly. Use the published site.");
 else {
-  const failed = () => { if (!ready) standby("The video player could not load here. Watch on YouTube instead."); };
-  window.onYouTubeIframeAPIReady = startPlayer;
+  showVideo();
+  const noRemote = () => { if (!ready) $("tvStatus").textContent = SCREEN_HINT; };
+  window.onYouTubeIframeAPIReady = connectRemote;
   const script = document.createElement("script");
-  script.src = "https://www.youtube.com/iframe_api"; script.onerror = failed;
+  script.src = "https://www.youtube.com/iframe_api"; script.onerror = noRemote;
   document.head.append(script);
-  waiting = setTimeout(failed, 9000);
+  setTimeout(noRemote, 10000);
 }
 
 /* Drifting stars, drawn about 30 times a second. */
