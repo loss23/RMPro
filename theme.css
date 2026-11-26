@@ -1,0 +1,19 @@
+/* Colors, fonts and base rules shared by both pages. */
+:root{
+  color-scheme:dark;
+  --bg:#04030a;--panel:#100e1b;--raise:#1d1a30;--surface:#100e1bc7;
+  --fg:#f6f4ff;--muted:#aeaac6;--line:#ffffff1a;
+  --accent:#ff6b35;--pink:#ff4fa3;--on:#12060a;
+  --grad:linear-gradient(100deg,#ff8a3d,#ff4fa3 52%,#a875ff);
+  --glass:linear-gradient(160deg,#ffffff12,#ffffff05 40%,#ffffff08);
+  --lift:inset 0 1px 0 #ffffff1f,0 2px 4px #0006,0 18px 36px -12px #000a,0 50px 90px -40px #7c3aed59;
+  --poster:"Anton","Bricolage Grotesque",Impact,sans-serif;
+  --display:"Bricolage Grotesque",system-ui,sans-serif;
+  --body:"Instrument Sans",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{background:var(--bg)}
+body{margin:0;color:var(--fg);font:16px/1.6 var(--body);overflow-x:clip;isolation:isolate}
+img{max-width:100%}
+#dust{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}

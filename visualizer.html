@@ -5,63 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>RMP Visualizer</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap">
-<style>
-/* Layout: floating nav, poster heading, large visual stage in a glass console, then transport, modes and playlist. Same dark space look as the main site. */
-:root{color-scheme:dark;--bg:#04030a;--fg:#f6f4ff;--muted:#aeaac6;--line:#ffffff1a;--accent:#ff6b35;--pink:#ff4fa3;--violet:#9d6bff;--on:#12060a;
---grad:linear-gradient(100deg,#ff8a3d,#ff4fa3 52%,#a875ff);--glass:linear-gradient(160deg,#ffffff12,#ffffff05 40%,#ffffff08);
---lift:inset 0 1px 0 #ffffff1f,0 2px 4px #0006,0 18px 36px -12px #000a,0 50px 90px -40px #7c3aed59;
---poster:"Anton","Bricolage Grotesque",Impact,sans-serif;--display:"Bricolage Grotesque",system-ui,sans-serif;--body:"Instrument Sans",system-ui,sans-serif}
-*{box-sizing:border-box}[hidden]{display:none!important}
-html{background:var(--bg)}
-body{margin:0;color:var(--fg);font:16px/1.6 var(--body);min-height:100vh;overflow-x:clip;isolation:isolate}
-.sky{position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(ellipse 70% 55% at 100% 0,#7c3aed40,transparent),radial-gradient(ellipse 60% 50% at 0 70%,#ff4fa324,transparent),radial-gradient(ellipse 50% 40% at 90% 100%,#ff6b351f,transparent)}
-.sky::before{content:"";position:absolute;inset:0;background:linear-gradient(156deg,transparent 36%,#b9a3ff17 46%,#ff4fa314 52%,#4f6bff12 57%,transparent 68%)}
-#dust{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
-main{max-width:1060px;margin:auto;padding-block:10px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 8px 6px 20px;background:linear-gradient(160deg,#ffffff14,#100e1bcc);border:1px solid var(--line);border-radius:99px;box-shadow:var(--lift)}
-.logo{font:800 1.35rem var(--display);text-decoration:none;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-.back{color:var(--muted);text-decoration:none;font-size:.9rem;font-weight:500;padding:8px 14px;border-radius:99px}
-.back:hover{color:var(--fg);background:#ffffff0f}
-h1{font:400 clamp(2.8rem,8vw,5.6rem)/1 var(--poster);text-transform:uppercase;margin:36px 0 22px;text-shadow:0 18px 50px #000b}
-h1::after{content:"✦";font-size:.4em;vertical-align:top;margin-left:.3em;color:var(--pink);text-shadow:none}
-.console{padding:14px;border:1px solid var(--line);border-radius:28px;background:var(--glass),#100e1bc7;box-shadow:var(--lift)}
-.screen{position:relative;background:var(--bg);border-radius:18px;overflow:hidden;height:clamp(250px,54vh,500px);box-shadow:0 0 0 1px #ffffff14,0 0 70px -24px #a875ffb3}
-canvas#viz{width:100%;height:100%;display:block}
-.screen:fullscreen{height:100%;border-radius:0}
-.screen button{position:absolute;right:10px;bottom:10px;z-index:2;background-color:#0b0914cc}
-.readout{display:flex;align-items:center;gap:14px;padding:16px 8px 4px;min-width:0}
-#title{flex:1;min-width:0;font:800 clamp(1.05rem,3vw,1.5rem)/1.3 var(--display);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-#time{color:var(--muted);font-variant-numeric:tabular-nums}
-#state{font-size:.72rem;font-weight:600;letter-spacing:.1em;padding:3px 12px;border-radius:99px;border:1px solid #ff4fa373;background:#ff4fa31a;color:#ffb3d5;white-space:nowrap}
-input[type=range]{accent-color:var(--accent);cursor:pointer;min-width:0}
-#seek{width:calc(100% - 16px);margin:8px 8px 4px}
-.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:8px}
-button,.file{font:600 .92rem/1.2 var(--body);color:var(--fg);cursor:pointer;padding:11px 18px;border-radius:99px;border:1px solid var(--line);background:#ffffff0a;transition:transform .2s,border-color .2s,background-color .2s}
-button:not(:disabled):hover,.file:hover{transform:translateY(-2px);border-color:#a875ff99}
-#play,#modes button[aria-pressed="true"]{background:var(--grad) border-box;color:var(--on);border-color:transparent}
-#play{min-width:112px;box-shadow:0 12px 30px -10px #ff4fa3b3}
-button:disabled{opacity:.5;cursor:default}
-button:focus-visible,.file:focus-within,a:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
-.file{position:relative}.file input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
-label.vol{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.9rem}
-.sep{flex:1}
-.modes{border-top:1px solid var(--line);margin-top:6px;padding-top:14px}
-#modes{padding:0;display:flex;flex-wrap:wrap;gap:8px}
-#motion{background:transparent;color:var(--muted)}
-.panel{margin-top:20px;border:1px solid var(--line);border-radius:28px;padding:20px;background:var(--glass),#100e1bc7;box-shadow:var(--lift)}
-.tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.tabs button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
-ol{margin:0;padding:0;list-style:none;counter-reset:n;display:grid;gap:6px}
-ol li{counter-increment:n}
-ol button{width:100%;display:flex;gap:14px;text-align:left;border-radius:16px;padding:14px 16px;background:transparent;border-color:transparent;overflow-wrap:anywhere}
-ol button::before{content:counter(n,decimal-leading-zero);color:var(--pink);font-variant-numeric:tabular-nums}
-ol button:not(:disabled):hover{background:#ffffff0d;transform:none}
-ol button[aria-current="true"]{background:linear-gradient(100deg,#ff6b3526,#8b5cf626);border-color:#ff6b8a8c}
-.sp-list{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.sp-list button[aria-pressed="true"]{border-color:var(--pink);background:#ff4fa326}
-.sp-out{color:#cbb5ff}#sp p{color:var(--muted)}
-@media(max-width:600px){.console,.panel{padding:10px;border-radius:22px}.sep{display:none}label.vol{width:100%}label.vol input{flex:1}.readout{flex-wrap:wrap;gap:6px 12px}#title{flex-basis:100%;order:-1;white-space:normal}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="visualizer.css">
 </head>
 <body>
 <div class="sky" aria-hidden="true"></div><canvas id="dust" aria-hidden="true"></canvas>
@@ -87,85 +32,8 @@ ol button[aria-current="true"]{background:linear-gradient(100deg,#ff6b3526,#8b5c
 </main>
 <audio id="audio" preload="metadata"></audio>
 <script src="config.js"></script>
+<script src="shared.js"></script>
 <script src="spotify.js"></script>
-<script>
-const $=id=>document.getElementById(id),audio=$("audio"),cv=$("viz"),g=cv.getContext("2d");
-const tracks=((window.RMP_CONFIG||{}).tracks||[]).slice();
-let index=tracks.findIndex(t=>t.src),loaded=-1,source="mine",ac=null,an=null,spotify=null;
-const freq=new Uint8Array(512),wave=new Uint8Array(1024);
-const say=t=>$("title").textContent=t;
-
-function renderList(){const list=$("list");list.textContent="";tracks.forEach((t,i)=>{const li=document.createElement("li"),b=document.createElement("button");b.type="button";b.textContent=t.title+" - "+t.artist+(t.src?"":" (coming soon)");b.disabled=!t.src;b.setAttribute("aria-current",String(i===loaded));b.onclick=()=>start(i);li.append(b);list.append(li)})}
-function graph(){if(ac)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;ac=new AC();an=ac.createAnalyser();an.fftSize=1024;an.smoothingTimeConstant=.78;ac.createMediaElementSource(audio).connect(an);an.connect(ac.destination)}
-function resume(){graph();if(ac&&ac.state!=="running")ac.resume();audio.play().catch(()=>say("Could not play this file. Check the file path or format."))}
-function start(i){if(!tracks[i]||!tracks[i].src)return;index=i;if(loaded!==i){loaded=i;audio.src=tracks[i].src;say(tracks[i].artist+" - "+tracks[i].title);renderList()}resume()}
-function skip(d){const n=tracks.length;for(let k=1;k<=n;k++){const i=(((loaded<0?0:loaded)+d*k)%n+n)%n;if(tracks[i].src)return start(i)}}
-$("play").onclick=()=>{if(source!=="mine")show("mine");if(!audio.paused)audio.pause();else if(loaded>=0)resume();else if(index>=0)start(index);else say("No RMP tracks yet. Use Open audio file to try the visualizer.")};
-$("stop").onclick=()=>{audio.pause();if(loaded>=0)audio.currentTime=0};
-$("prev").onclick=()=>skip(-1);$("next").onclick=()=>skip(1);
-$("file").onchange=e=>{const files=[...e.target.files];if(!files.length)return;show("mine");const first=tracks.length;files.forEach(f=>tracks.push({title:f.name.replace(/\.[^.]+$/,""),artist:"Your file",src:URL.createObjectURL(f)}));start(first);e.target.value=""};
-audio.volume=.8;$("vol").oninput=e=>audio.volume=e.target.value/100;
-const clock=s=>Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0");
-audio.ontimeupdate=()=>{$("time").textContent=clock(audio.currentTime);if(audio.duration)$("seek").value=audio.currentTime/audio.duration*1000};
-audio.onloadedmetadata=()=>$("seek").disabled=!isFinite(audio.duration);
-$("seek").oninput=e=>{if(audio.duration)audio.currentTime=e.target.value/1000*audio.duration};
-audio.onplay=()=>{if(spotify)spotify.pause();$("play").textContent="Pause";$("state").textContent="PLAY"};
-audio.onpause=()=>{$("play").textContent="Play";$("state").textContent=source==="mine"?"PAUSE":"FREE RUN"};
-audio.onended=()=>skip(1);
-
-function show(which){source=which;const mine=which==="mine";$("mine").hidden=!mine;$("sp").hidden=mine;$("tabMine").setAttribute("aria-pressed",String(mine));$("tabSp").setAttribute("aria-pressed",String(!mine));
-if(mine){if(spotify)spotify.pause();$("state").textContent=loaded<0?"DEMO":"PAUSE";say(loaded<0?"Pick a track or open an audio file":tracks[loaded].artist+" - "+tracks[loaded].title)}
-else{audio.pause();$("state").textContent="FREE RUN";say("Spotify source: visuals are free running");
-/* No playback listener here on purpose: nothing on this canvas reads Spotify playback. */
-if(!spotify)spotify=window.RMPSpotify?RMPSpotify.mount({items:(window.RMP_CONFIG||{}).spotify,host:$("spHost"),list:$("spList"),status:$("spStatus")}):{pause(){}}}}
-$("tabMine").onclick=()=>show("mine");$("tabSp").onclick=()=>show("spotify");
-
-/* ---------- visuals ---------- */
-const MODES=[["bars","Spectrum"],["scope","Oscilloscope"],["tunnel","Warp tunnel"],["stars","Starfield"]];
-let mode="bars";try{const m=localStorage.getItem("rmp-viz");if(MODES.some(x=>x[0]===m))mode=m}catch(e){}
-MODES.forEach(([id,name])=>{const b=document.createElement("button");b.type="button";b.textContent=name;b.dataset.mode=id;b.setAttribute("aria-pressed",String(id===mode));b.onclick=()=>{mode=id;try{localStorage.setItem("rmp-viz",id)}catch(e){}[...$("modes").children].forEach(x=>x.setAttribute("aria-pressed",String(x===b)));clear();dirty=true};$("modes").append(b)});
-let motion=!matchMedia("(prefers-reduced-motion: reduce)").matches,dirty=true;
-const label=()=>$("motion").textContent=motion?"Pause visuals":"Start visuals";
-$("motion").onclick=()=>{motion=!motion;dirty=true;label()};label();
-$("full").onclick=()=>{const s=$("screen");if(document.fullscreenElement)document.exitFullscreen();else if(s.requestFullscreen)s.requestFullscreen().catch(()=>say("Full screen is not available here"));else say("Full screen is not available on this device")};
-document.addEventListener("fullscreenchange",()=>$("full").textContent=document.fullscreenElement?"Exit full screen":"Full screen");
-
-let W=0,H=0;const peaks=new Array(48).fill(0),buf=document.createElement("canvas"),bx=buf.getContext("2d");
-const stars=Array.from({length:260},()=>({x:Math.random()*2-1,y:Math.random()*2-1,z:Math.random()*.95+.05}));
-const TINTS=["#ffffff","#ffffff","#cfd8ff","#d9c2ff","#ffc4e1","#ffd2ad"];
-const sweep=()=>{const c=g.createLinearGradient(0,0,W,0);c.addColorStop(0,"#ff8a3d");c.addColorStop(.5,"#ff4fa3");c.addColorStop(1,"#a875ff");return c};
-function clear(){g.globalAlpha=1;g.fillStyle="#04030a";g.fillRect(0,0,W,H)}
-function size(){const r=Math.min(devicePixelRatio||1,2),w=Math.round(cv.clientWidth*r),h=Math.round(cv.clientHeight*r);if(cv.width!==w||cv.height!==h){cv.width=buf.width=w;cv.height=buf.height=h;W=w;H=h;clear();dirty=true}}
-/* Live data only from our own <audio>. Otherwise a made-up signal driven by the clock. */
-function sample(t){if(source==="mine"&&an&&!audio.paused){an.getByteFrequencyData(freq);an.getByteTimeDomainData(wave);return}
-for(let i=0;i<512;i++)freq[i]=Math.max(0,(150+60*Math.sin(i*.09+t*1.7)+40*Math.sin(i*.031-t*1.1))*(1-i/620));
-for(let i=0;i<1024;i++)wave[i]=128+34*Math.sin(i*.03+t*2.3)+16*Math.sin(i*.011-t*1.4)}
-const level=(a,b)=>{let s=0;for(let i=a;i<b;i++)s+=freq[i];return s/(b-a)/255};
-function bars(){clear();const n=48,w=W/n,seg=Math.max(4,H/48),floor=H*.78,tone=sweep();for(let i=0;i<n;i++){const a=Math.floor(Math.pow(400,i/n)),b=Math.max(a+1,Math.floor(Math.pow(400,(i+1)/n))),v=level(a,b)*floor*.95;
-g.fillStyle=tone;for(let y=0;y<v;y+=seg){g.globalAlpha=1;g.fillRect(i*w+1,floor-y-seg+2,w-3,seg-2);const back=y*.3;if(back<H-floor){g.globalAlpha=.22*(1-back/(H-floor));g.fillRect(i*w+1,floor+back+3,w-3,Math.max(1,seg*.3-1))}}
-g.globalAlpha=1;peaks[i]=Math.max(v,peaks[i]-H*.006);g.fillStyle="#fff";g.fillRect(i*w+1,floor-peaks[i]-4,w-3,3)}}
-function trace(color,width,fn){g.strokeStyle=color;g.lineWidth=width;g.beginPath();fn();g.stroke()}
-function scope(){g.fillStyle="rgba(4,3,10,.3)";g.fillRect(0,0,W,H);const tone=sweep();for(const [c,lw,alpha] of [[tone,H/34,.2],[tone,H/110,1],["#fff",Math.max(1,H/420),.8]]){g.globalAlpha=alpha;trace(c,lw,()=>{for(let i=0;i<1024;i+=2){const x=i/1022*W,y=H/2+(wave[i]-128)/128*H*.46;i?g.lineTo(x,y):g.moveTo(x,y)}})}g.globalAlpha=1}
-/* Feedback loop: redraw the last frame slightly bigger and rotated, in the style of early-2000s PC visualizers. */
-function tunnel(t){bx.clearRect(0,0,W,H);bx.drawImage(cv,0,0);clear();const bass=level(1,12);g.save();g.translate(W/2,H/2);g.rotate(.018+.01*Math.sin(t*.3));const z=1.035+bass*.025;g.scale(z,z);g.globalAlpha=.9;g.drawImage(buf,-W/2,-H/2);g.restore();
-const R=Math.min(W,H)*(.14+bass*.1);trace("hsl("+(320+62*Math.sin(t*.55))+",100%,65%)",H/160,()=>{for(let i=0;i<=180;i++){const a=i/180*Math.PI*2,r=R+(wave[(i%180)*5]-128)/128*R*.9,x=W/2+Math.cos(a+t*.5)*r,y=H/2+Math.sin(a+t*.5)*r;i?g.lineTo(x,y):g.moveTo(x,y)}})}
-function starfield(t,dt){g.fillStyle="rgba(4,3,10,.4)";g.fillRect(0,0,W,H);const speed=(.15+level(1,40)*.8)*dt;for(let n=0;n<stars.length;n++){const s=stars[n],old=s.z;s.z-=speed;if(s.z<=.05){s.x=Math.random()*2-1;s.y=Math.random()*2-1;s.z=1;continue}
-const p=z=>[W/2+s.x/z*W*.28,H/2+s.y/z*H*.28],[x0,y0]=p(old),[x1,y1]=p(s.z);trace(TINTS[n%TINTS.length],(1-s.z)*H/130+1,()=>{g.moveTo(x0,y0);g.lineTo(x1+.5,y1+.5)})}
-/* a ringed planet in the middle, swelling with the low end */
-const r=Math.min(W,H)*(.08+level(1,12)*.09),orb=g.createRadialGradient(W/2-r*.35,H/2-r*.4,r*.05,W/2,H/2,r*1.05);orb.addColorStop(0,"#ffd2ad");orb.addColorStop(.28,"#ff6b8a");orb.addColorStop(.68,"#6d35c9");orb.addColorStop(1,"#1a0d38");
-const ring=(from,to)=>{g.strokeStyle="#ffc4e1b3";g.lineWidth=Math.max(1.5,r*.05);g.beginPath();g.ellipse(W/2,H/2,r*1.75,r*.46,-.32,from,to);g.stroke()};
-ring(Math.PI,Math.PI*2);g.fillStyle=orb;g.beginPath();g.arc(W/2,H/2,r,0,7);g.fill();ring(0,Math.PI)}
-const draw={bars,scope,tunnel,stars:starfield};
-const sky=$("dust"),sg=sky.getContext("2d");
-const field=Array.from({length:Math.round(Math.min(600,Math.max(220,innerWidth*innerHeight/1900)))},(_,i)=>{const big=i%14===0;return{x:Math.random(),y:Math.random(),r:big?1.4+Math.random():.7+Math.random()*1.1,big,c:TINTS[i%TINTS.length],phase:Math.random()*7,speed:.8+Math.random()*2}});
-let skyKey="";
-function night(){const r=Math.min(devicePixelRatio||1,2),w=sky.clientWidth,h=sky.clientHeight,fresh=sky.width!==Math.round(w*r)||sky.height!==Math.round(h*r);if(!motion&&!fresh&&skyKey==="still")return;skyKey=motion?"":"still";
-if(fresh){sky.width=Math.round(w*r);sky.height=Math.round(h*r)}sg.setTransform(r,0,0,r,0,0);sg.clearRect(0,0,w,h);for(const p of field){const glow=motion?.65+.35*Math.sin(vt*p.speed+p.phase):1;sg.globalAlpha=(p.big?.9:.62)*glow;sg.fillStyle=p.c;sg.fillRect(p.x*w,p.y*h,p.r,p.r);if(p.big){sg.globalAlpha=.35*glow;sg.fillRect(p.x*w-p.r*2.5,p.y*h+p.r/2-.4,p.r*6,.8);sg.fillRect(p.x*w+p.r/2-.4,p.y*h-p.r*2.5,.8,p.r*6)}}}
-let last=0,vt=0;
-function frame(ms){const dt=Math.min(.05,(ms-last)/1000||0);last=ms;size();
-if(W&&H){if(motion){vt+=dt;sample(vt);draw[mode](vt,dt)}else if(dirty){for(let k=0;k<40;k++){sample(2+k/60);draw[mode](2+k/60,1/60)}}dirty=false}
-night();requestAnimationFrame(frame)}
-renderList();requestAnimationFrame(frame);
-</script>
+<script src="visualizer.js"></script>
 </body>
 </html>
