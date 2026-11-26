@@ -263,10 +263,15 @@ wireDialog($("poster"), $("posterClose"));
 pastShows.forEach(show => {
   const card = el("li", "", "recap"), bill = el("div", "", "bill"), title = el("h3", show.headliner), openers = el("div", "", "openers"), story = el("div", "", "story");
   title.append(el("small", show.place));
+  if (show.guest) { // the guest gets a big name of their own
+    const guest = el("span", "", "guest");
+    guest.append(el("em", "Special guest"), el("strong", show.guest));
+    title.append(guest);
+  }
   show.openers.map(name => artists.find(a => a.name === name)).filter(Boolean).forEach(a => openers.append(artistButton(a, "opener")));
   bill.append(title, openers);
   story.append(el("p", show.summary, "lead"));
-  if (show.date || show.venue) story.append(factList([["When", show.date], ["Where", show.venue]]));
+  if (show.date || show.venue) story.append(factList([["When", show.date, show.time], ["Where", show.venue, show.address]]));
   if (show.photos.length) {
     const gallery = el("div", "", "gallery");
     show.photos.forEach((src, n) => addImage(gallery, src, show.headliner + " " + show.place + ", photo " + (n + 1)));
@@ -278,7 +283,7 @@ pastShows.forEach(show => {
 /* ---------- scrolling: progress bar, current nav link, background parallax ---------- */
 const sections = [...document.querySelectorAll("section")];
 const navLinks = [...document.querySelectorAll('.links a[href^="#"]')];
-const NAV_ALIAS = { past: "shows", collaborators: "artists" }; // sections without their own nav link
+const NAV_ALIAS = { past: "shows", collaborators: "artists", signup: "book" }; // sections without their own nav link
 let scrollQueued = false;
 function updateOnScroll() {
   scrollQueued = false;
@@ -302,7 +307,7 @@ if (!calm.matches && "IntersectionObserver" in window) {
     reveal.unobserve(e.target); e.target.classList.add("in");
     setTimeout(() => e.target.classList.remove("rise", "in"), 1000);
   }), { rootMargin: "0px 0px -6% 0px" });
-  document.querySelectorAll(".head,.radio,#chips,#artistList,#collabList,#showList,#pastList,#merchList,.about")
+  document.querySelectorAll(".head,.radio,#chips,#artistList,#collabList,#showList,#pastList,#merchList,.panel-form,.signup,.about")
     .forEach(node => { node.classList.add("rise"); reveal.observe(node); });
 }
 

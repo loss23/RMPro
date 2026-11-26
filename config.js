@@ -6,6 +6,12 @@ window.RMP_CONFIG = {
     collection: "",        // optional collection handle, e.g. "merch". Blank = all products.
     apiVersion: "2026-10"  // Shopify releases new versions quarterly; update periodically.
   },
+  // Booking form: requests are written as an email to this address.
+  booking: { email: "Remunerativerecords@gmail.com" },
+  // Email sign-up. With "action" blank, visitors send RMP an email asking to join, and you add them yourself.
+  // To collect sign-ups automatically, paste your mailing list service's form address (it starts with https://)
+  // and set emailField to the name that service expects for the email box (Mailchimp uses "EMAIL").
+  signup: { action: "", emailField: "email" },
   // RMP.TV (tv.html). With "videos" empty, the TV plays the channel's own uploads from YouTube.
   // To choose the videos and their order yourself, list them, for example:
   //   videos: [{ title: "My video", link: "https://youtu.be/VIDEO_ID" }]

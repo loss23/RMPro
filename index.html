@@ -25,7 +25,7 @@
 <body>
 <div class="sky" aria-hidden="true"><i></i><i></i><i></i></div><canvas id="dust" aria-hidden="true"></canvas>
 <header><div class="wrap"><nav aria-label="Main">
-<a class="logo" href="#home">RMP</a><div class="links"><a href="#listen">Listen</a><a href="tv.html">RMP.TV</a><a href="#artists">Artists</a><a href="#shows">Shows</a><a href="#merch">Merch</a><a href="#about">About</a><a href="visualizer.html">Visualizer</a></div>
+<a class="logo" href="#home">RMP</a><div class="links"><a href="#listen">Listen</a><a href="tv.html">RMP.TV</a><a href="spotlight.html">Spotlight</a><a href="#artists">Artists</a><a href="#shows">Shows</a><a href="#merch">Merch</a><a href="#book">Book</a><a href="#about">About</a><a href="visualizer.html">Visualizer</a></div>
 <div class="progress" id="progress" aria-hidden="true"></div></nav></div></header>
 <main>
 <div class="stage" id="home"><canvas id="waves" aria-hidden="true"></canvas><div class="hero wrap"><div>
@@ -62,7 +62,28 @@
 <section id="past" data-word="Replay"><div class="head"><h2>Past shows</h2><p class="sub">Select an opener to meet the artist.</p></div><ul id="pastList"></ul></section>
 <section id="merch" data-word="Wear"><div class="head"><h2>Merch</h2><p class="sub" id="merchNote" aria-live="polite"></p></div><div class="grid" id="merchList"></div>
 <div id="cart" class="cart" hidden><h3>Your cart</h3><ul id="cartLines"></ul><p id="cartTotal"></p><p class="sub">Taxes and shipping are calculated at checkout.</p><a class="btn" id="checkout" href="#merch" target="_blank" rel="noopener">Check out on Shopify</a></div><p id="cartMsg" role="status"></p></section>
-<section id="about" data-word="RMP"><div class="head"><h2>About and booking</h2></div><div class="about"><div><p class="lead">RMP is dedicated to cultivating creativity. Our goal is to become the leading media organization in our city, reach broad audiences and help our partners achieve their goals.</p><p class="email"><span>General email</span> <a href="mailto:Remunerativerecords@gmail.com">Remunerativerecords@gmail.com</a></p><p class="sub">Booking details are coming soon. Follow RMP:</p><div class="social"><a class="btn ghost" href="https://www.instagram.com/remmediapro/" target="_blank" rel="noopener">Instagram</a><a class="btn ghost" href="https://www.youtube.com/@rrmediapro" target="_blank" rel="noopener">YouTube</a></div></div>
+<section id="book" data-word="Book"><div class="head"><h2>Book RMP</h2><p class="sub">Artists, photography, media campaigns and fashion.</p></div>
+<div class="panel-form">
+<form id="bookForm" class="fields">
+<label>Your name<input name="name" autocomplete="name" required></label>
+<label>Your email<input name="email" type="email" autocomplete="email" required></label>
+<label>What are you booking?<select name="type" required><option value="">Choose one</option><option>Artist performance</option><option>Photography</option><option>Media campaign</option><option>Fashion</option><option>Something else</option></select></label>
+<label>Artist (optional)<select name="artist" id="bookArtist"><option value="">Not sure yet</option></select></label>
+<label>Event date (optional)<input name="date" type="date"></label>
+<label>City or venue (optional)<input name="place"></label>
+<label class="full">Tell us about it<textarea name="details" rows="5" required></textarea></label>
+<div class="full"><button type="submit">Write my booking email</button></div>
+</form>
+<div class="draft" id="bookDraft" hidden><p><b>Your email is ready.</b> It isn’t sent until you send it from your email.</p><textarea readonly rows="8" aria-label="Your booking email"></textarea><div class="actions"><a class="btn" href="#book">Open in my email app</a><button type="button" class="ghost">Copy message</button></div><p class="sub" role="status"></p></div>
+</div></section>
+<section id="signup" aria-labelledby="signupHeading"><div class="signup">
+<div><h2 id="signupHeading">Join the list</h2><p>Get RMP news about shows, releases and merch.</p></div>
+<div><form id="signupForm"><label for="signupEmail">Email address</label><div class="signup-row"><input id="signupEmail" type="email" autocomplete="email" placeholder="you@example.com" required><button type="submit" id="signupButton">Write my sign-up email</button></div></form>
+<p class="sub" id="signupHow">This writes a short email for you to send to RMP.</p>
+<p class="sub">Your address is for RMP updates. To stop them, email Remunerativerecords@gmail.com.</p>
+<div class="draft" id="signupDraft" hidden><p><b>Your email is ready.</b> It isn’t sent until you send it from your email.</p><textarea readonly rows="8" aria-label="Your sign-up email"></textarea><div class="actions"><a class="btn" href="#book">Open in my email app</a><button type="button" class="ghost">Copy message</button></div><p class="sub" role="status"></p></div></div>
+</div></section>
+<section id="about" data-word="RMP"><div class="head"><h2>About</h2></div><div class="about"><div><p class="lead">RMP is dedicated to cultivating creativity. Our goal is to become the leading media organization in our city, reach broad audiences and help our partners achieve their goals.</p><p class="email"><span>General email</span> <a href="mailto:Remunerativerecords@gmail.com">Remunerativerecords@gmail.com</a></p><p class="sub">To book RMP, use the <a href="#book">booking form</a>. Follow RMP:</p><div class="social"><a class="btn ghost" href="https://www.instagram.com/remmediapro/" target="_blank" rel="noopener">Instagram</a><a class="btn ghost" href="https://www.youtube.com/@rrmediapro" target="_blank" rel="noopener">YouTube</a></div></div>
 <div><details open name="work"><summary>Media campaigns</summary><p>Campaigns that showcase our roster of artists.</p></details><details name="work"><summary>Photography</summary><p>Photo work featuring our artists.</p></details><details name="work"><summary>Fashion</summary><p>Exclusive fashion content featuring our artists.</p></details></div></div></section>
 </div></main>
 <footer><div class="wrap"><span>Remunerative Media Productions · Huntsville, AL · Atlanta, GA</span><a class="footer-mail" href="mailto:Remunerativerecords@gmail.com">Remunerativerecords@gmail.com</a><div class="social"><a class="btn ghost" href="https://www.instagram.com/remmediapro/" target="_blank" rel="noopener">Instagram</a><a class="btn ghost" href="https://www.youtube.com/@rrmediapro" target="_blank" rel="noopener">YouTube</a></div><a href="#home">Back to top</a></div></footer>
@@ -77,6 +98,7 @@
 <script src="spotify.js"></script>
 <script src="shopify.js"></script>
 <script src="app.js"></script>
+<script src="forms.js"></script>
 <script src="effects.js"></script>
 </body>
 </html>

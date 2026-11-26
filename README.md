@@ -5,11 +5,11 @@ Upload every file in this folder to the same place on your web host. No build st
 ## Which file to edit
 | To change | Edit |
 |---|---|
-| Artists, collaborators, upcoming and past shows | `content.js` |
+| Artists, collaborators, shows and the spotlight | `content.js` |
 | Shopify, Spotify and your own tracks | `config.js` |
-| Page text and section order | `index.html`, `visualizer.html`, `tv.html` |
+| Page text and section order | `index.html`, `visualizer.html`, `tv.html`, `spotlight.html` |
 | Colors and fonts (both pages) | `theme.css` |
-| Layout and looks | `styles.css` (home), `visualizer.css`, `tv.css` |
+| Layout and looks | `styles.css` (home), `visualizer.css`, `tv.css`, `spotlight.css` |
 
 Other scripts: `app.js` (player and page content), `effects.js` (home animation), `shared.js` (star field and
 canvas helpers used by both pages), `spotify.js`, `shopify.js`, `visualizer.js`. Keep the script order in the HTML files.
@@ -23,6 +23,18 @@ canvas helpers used by both pages), `spotify.js`, `shopify.js`, `visualizer.js`.
 
 The site shows up to 12 products with up to 20 options each. Checkout and payment happen on Shopify.
 A password-protected store may block checkout until the password is removed.
+
+## Booking and email sign-up
+The site has no server. The booking form writes an email to `booking.email` in `config.js`; the visitor opens or
+copies it and sends it. Sign-up works the same way until you set `signup.action` to your mailing list service's
+form address (and `signup.emailField` to its email field name). Check that service's own setup steps, send a test
+sign-up, and add any consent wording it or the law requires. The note under the sign-up box promises that people
+can email RMP to stop updates, so honor those requests.
+
+## Spotlight page
+`spotlight.html` features the artist named in `spotlight` in `content.js`. You can add a `headline`, a `release`
+(`title` and `link`) and a YouTube `video`; each stays hidden while blank. Other artists can be picked at the top,
+and each has its own link, such as `spotlight.html#deerob`.
 
 ## RMP.TV
 `tv.html` is a TV-style page around YouTube's own player. Settings are `youtube` in `config.js`.
@@ -78,7 +90,7 @@ Use a web host or a local server (`python3 -m http.server`), not a double-clicke
 - The name ticker fills itself from the `artists` list.
 
 ## Past shows
-Edit the `pastShows` list in `content.js`. Each entry has a headliner, place, date, venue, openers, summary and photos.
+Edit the `pastShows` list in `content.js`. Each entry has a headliner, optional special guest, place, date, time, venue, address, openers, summary and photos.
 Opener names must match the `artists` list. To add pictures from a show, put them in `images` and list
 their paths in `photos`. Upcoming shows do not move here by themselves; add an entry after the show.
 

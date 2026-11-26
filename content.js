@@ -13,6 +13,13 @@ const artists = [
 {name:"E.A.Z.E",tags:["Melodic rap","R&B","Atmospheric hip-hop"],full:"images/eaze-full.jpg",photo:"images/eaze.jpg",mono:"EZ",bg:"linear-gradient(145deg,#2b2f38,#0d0e12)",bio:"E.A.Z.E is an artist who blends melodic rap, R&B, and atmospheric hip-hop into a sound that feels cinematic, nostalgic, and emotionally unpredictable. Inspired by the energy of the '80s, the melodies of Michael Jackson, and the modern sonic worlds of Don Toliver, Travis Scott, and The Weeknd, E.A.Z.E creates music that balances vulnerability, confidence, and mystery.\n\nHis music explores love, betrayal, ambition, temptation, personal growth, and the chaos that comes with navigating life while trying to become something greater. With melodic vocals, layered harmonies, moody production, and an effortlessly smooth delivery, E.A.Z.E turns real emotions into records that feel like scenes from a movie.\n\nMore than just music, E.A.Z.E is building a world—one where dark aesthetics, nostalgic sounds, raw emotion, and modern artistry collide. Whether it's a late-night record, a toxic love story, or an anthem about overcoming setbacks, his goal is to make listeners feel something, see something, and remember something.\n\nHe's not chasing a sound. He's creating a feeling.",service:"Spotify",linkLabel:"Open Spotify profile",url:"https://open.spotify.com/user/31ecejq75otkhilzaaarksdwuwvu"}
 ];
 
+/* The Spotlight page (spotlight.html). artist must match a name above.
+   The rest is optional and stays hidden while blank:
+   headline: one line about why they're in the spotlight.
+   release: { title, link } - a Spotify link shows a player; any other https link shows a button.
+   video: a YouTube video link. */
+const spotlight = { artist: "CUDDiE", headline: "", release: { title: "", link: "" }, video: "" };
+
 /* featured: true gives a larger, highlighted card listed first.
    Optional: handle, url (their Instagram), role (a short line) and photo (use only images you have permission to use). */
 const collaborators=[{name:"RichGXTH",featured:true,handle:"@richgxth",url:"https://www.instagram.com/richgxth/",role:"",photo:"images/richgxth.jpg",mono:"RG"},
@@ -27,5 +34,5 @@ starts:"2027-01-01T20:00:00-06:00",ends:"2027-01-02T00:00:00-06:00",venue:"Maggi
 price:"$10 admission",deal:"Ladies get in free till 10 PM",note:"RMP presents, with performances from local artists.",
 flyer:"images/new-years-flyer.jpg",url:""}];
 
-/* Past shows. Empty date, venue or photos are left out. Openers must match names in "artists". */
-const pastShows=[{headliner:"Lil Tracy",place:"in Huntsville",date:"Wednesday, October 28, 2026",venue:"Von Braun Center, Mars Music Hall",openers:["CUDDiE","Michael Ville"],summary:"Michael Ville and CUDDiE opened and performed.",photos:[]}];
+/* Past shows. guest is an optional special guest. Empty date, time, venue, address or photos are left out. Openers must match names in "artists". */
+const pastShows=[{headliner:"RichGXTH",guest:"Lil Tracy",place:"in Huntsville",date:"Wednesday, October 28, 2026",time:"7:00 PM",venue:"Von Braun Center, Mars Music Hall",address:"700 Monroe Street SW, Huntsville, AL 35801",openers:["CUDDiE","Michael Ville"],summary:"Michael Ville and CUDDiE opened and performed.",photos:[]}];

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RMP Spotlight | Remunerative Media Productions</title>
+<meta name="description" content="RMP Spotlight: get to know the artists of Remunerative Media Productions, hear their music and see where they have played.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://loss23.github.io/RMPro/spotlight.html">
+<meta property="og:image" content="https://loss23.github.io/RMPro/images/logo.jpg">
+<meta property="og:site_name" content="Remunerative Media Productions">
+<meta property="og:title" content="RMP Spotlight | Remunerative Media Productions">
+<meta property="og:description" content="Get to know the artists of Remunerative Media Productions.">
+<meta name="theme-color" content="#04030a">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="spotlight.css">
+</head>
+<body>
+<div class="sky" aria-hidden="true"><i></i><i></i><i></i></div><canvas id="dust" aria-hidden="true"></canvas>
+<header><div class="wrap"><nav aria-label="Main">
+<a class="logo" href="index.html">RMP</a><div class="links"><a href="index.html#listen">Listen</a><a href="tv.html">RMP.TV</a><a href="spotlight.html" aria-current="page">Spotlight</a><a href="index.html#artists">Artists</a><a href="index.html#shows">Shows</a><a href="index.html#merch">Merch</a><a href="index.html#book">Book</a><a href="index.html#about">About</a><a href="visualizer.html">Visualizer</a></div>
+</nav></div></header>
+<main class="wrap spot-page">
+<p class="spot-kicker">RMP Spotlight</p>
+<nav class="spot-picks" id="picks" aria-label="Choose an artist"></nav>
+
+<article class="spot">
+<div class="spot-photo" id="photo"></div>
+<div class="spot-words">
+<h1 id="name"></h1>
+<p class="role" id="role" hidden></p>
+<p class="spot-headline" id="headline" hidden></p>
+<div class="tags" id="tags"></div>
+<p id="bio"></p>
+<div class="actions" id="links"></div>
+</div>
+</article>
+
+<section class="spot-block" id="release" hidden><h2>Latest release</h2><p class="lead" id="releaseTitle"></p><div class="spot-frame" id="releasePlayer"></div></section>
+<section class="spot-block" id="video" hidden><h2>Watch</h2><div class="spot-frame wide" id="videoPlayer"></div></section>
+<section class="spot-block" id="music" hidden><h2>Listen</h2><div class="spot-frame" id="musicPlayer"></div></section>
+<section class="spot-block" id="stage" hidden><h2>On stage</h2><ul class="spot-shows" id="showRows"></ul></section>
+</main>
+<footer><div class="wrap"><span>Remunerative Media Productions · Huntsville, AL · Atlanta, GA</span><a class="footer-mail" href="mailto:Remunerativerecords@gmail.com">Remunerativerecords@gmail.com</a><div class="social"><a class="btn ghost" href="https://www.instagram.com/remmediapro/" target="_blank" rel="noopener">Instagram</a><a class="btn ghost" href="https://www.youtube.com/@rrmediapro" target="_blank" rel="noopener">YouTube</a></div><a href="index.html">RMP home</a></div></footer>
+
+<script src="content.js"></script>
+<script src="shared.js"></script>
+<script src="spotify.js"></script>
+<script src="spotlight.js"></script>
+</body>
+</html>
